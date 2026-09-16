@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <!-- STREAMING_CHUNK: Cấu hình thẻ meta và tiêu đề -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHÒNG THOÁT HIỂM & ĐỀ KIỂM TRA CHƯƠNG TẬP HỢP - TOÁN 10</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- STREAMING_CHUNK: Cấu hình thư viện MathJax -->
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']],
+          processEscapes: true,
+        },
+        options: {
+          renderActions: {
+            addMenu: []
+          }
+        }
+      };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* STREAMING_CHUNK: Khởi tạo biến màu sắc CSS toàn cục */
+        :root {
+            --bg-color: #0d0f12;
+            --panel-bg: #161a22;
+            --accent-green: #00ff66;
+            --accent-red: #ff3333;
+            --accent-blue: #00ccff;
+            --text-main: #f0f4f8;
+            --text-muted: #8a99ad;
+            --er-border-color: #2a313d;
+            --glow-green: 0 0 15px rgba(0, 255, 102, 0.4);
+            --glow-red: 0 0 15px rgba(255, 51, 51, 0.4);
+            --glow-blue: 0 0 15px rgba(0, 204, 255, 0.4);
+            
+            --primary-color: #123B75;
+            --secondary-color: #F5B400;
+            --background-color: #F7FAFF;
+            --text-color: #1e293b;
+            --border-color: #cbd5e1;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --white: #ffffff;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { margin: 0; padding: 0; overflow-x: hidden; }
+
+        /* STREAMING_CHUNK: Định dạng giao diện Escape Room */
+        #escape-room-wrapper {
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            background-image: 
+                radial-gradient(at 10% 20%, rgba(0, 255, 102, 0.03) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(0, 204, 255, 0.03) 0px, transparent 50%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        #escape-room-wrapper::before {
+            content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 9999; background-size: 100% 4px, 6px 100%; pointer-events: none; opacity: 0.4;
+        }
+
+        #escape-room-wrapper header { text-align: center; padding: 20px 10px; border-bottom: 2px solid var(--er-border-color); background-color: rgba(22, 26, 34, 0.8); backdrop-filter: blur(10px); box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5); z-index: 10; }
+        #escape-room-wrapper h1 { font-family: 'Orbitron', sans-serif; font-size: 2rem; font-weight: 900; letter-spacing: 2px; color: #ffffff; text-shadow: 0 0 10px rgba(255, 255, 255, 0.1), var(--glow-green); margin-bottom: 5px; }
+        #escape-room-wrapper h1 span { color: var(--accent-green); }
+        #escape-room-wrapper .subtitle { font-family: 'Share Tech Mono', monospace; font-size: 0.95rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* STREAMING_CHUNK: Định dạng bảng điều khiển Escape Room */
+        #escape-room-wrapper .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; max-width: 1200px; margin: 15px auto; width: 95%; gap: 15px; text-align: center; }
+        #escape-room-wrapper .dash-card { background-color: var(--panel-bg); border: 1px solid var(--er-border-color); padding: 10px 15px; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        #escape-room-wrapper .dash-label { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; }
+        #escape-room-wrapper .dash-value { font-family: 'Orbitron', sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--accent-blue); }
+        #score-val { color: #ffcc00; text-shadow: 0 0 10px rgba(255, 204, 0, 0.3); }
+
+        #escape-room-wrapper #progress-container { width: 100%; height: 10px; background-color: #222a36; border-radius: 5px; overflow: hidden; border: 1px solid #3b485c; }
+        #escape-room-wrapper #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-green)); box-shadow: var(--glow-green); transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        #escape-room-wrapper main { flex: 1; max-width: 1200px; width: 95%; margin: 10px auto 40px auto; display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 25px; }
+        @media (max-width: 900px) { #escape-room-wrapper main { grid-template-columns: 1fr; } #escape-room-wrapper .dashboard { grid-template-columns: 1fr; gap: 10px; } }
+
+        /* STREAMING_CHUNK: Định dạng khu vực câu hỏi (locks) */
+        #escape-room-wrapper .workspace-panel { background-color: var(--panel-bg); border: 1px solid var(--er-border-color); border-radius: 12px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        #escape-room-wrapper .panel-title { font-family: 'Orbitron', sans-serif; font-size: 1.15rem; font-weight: 700; border-bottom: 1px solid var(--er-border-color); padding-bottom: 10px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 1px; }
+
+        #escape-room-wrapper .locks-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px; }
+        @media (max-width: 550px) { #escape-room-wrapper .locks-grid { grid-template-columns: 1fr; } }
+        #escape-room-wrapper .lock-card { background-color: rgba(13, 15, 18, 0.6); border: 1px solid var(--er-border-color); border-radius: 10px; padding: 15px; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); position: relative; display: flex; flex-direction: column; gap: 10px; min-height: 130px; }
+        #escape-room-wrapper .lock-card:hover { border-color: var(--accent-blue); transform: translateY(-2px); background-color: rgba(0, 204, 255, 0.02); }
+        #escape-room-wrapper .lock-card.active { border-color: var(--accent-blue); box-shadow: var(--glow-blue); background-color: rgba(0, 204, 255, 0.05); }
+        #escape-room-wrapper .lock-card.unlocked { border-color: var(--accent-green); box-shadow: var(--glow-green); background-color: rgba(0, 255, 102, 0.03); }
+
+        #escape-room-wrapper .lock-header { display: flex; justify-content: space-between; align-items: center; }
+        #escape-room-wrapper .lock-name { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 0.95rem; color: #ffffff; }
+        #escape-room-wrapper .lock-status-badge { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; }
+        #escape-room-wrapper .status-locked { background-color: rgba(255, 51, 51, 0.15); color: var(--accent-red); border: 1px solid rgba(255, 51, 51, 0.3); }
+        #escape-room-wrapper .status-unlocked { background-color: rgba(0, 255, 102, 0.15); color: var(--accent-green); border: 1px solid rgba(0, 255, 102, 0.3); }
+
+        /* STREAMING_CHUNK: Định dạng biểu tượng ổ khóa và nhãn gợi ý */
+        #escape-room-wrapper .lock-icon-container { display: flex; justify-content: center; align-items: center; flex: 1; margin: 10px 0; }
+        #escape-room-wrapper .lock-icon-container svg { width: 40px; height: 40px; fill: var(--text-muted); transition: all 0.3s; }
+        #escape-room-wrapper .lock-card.unlocked .lock-icon-container svg { fill: var(--accent-green); transform: scale(1.1); }
+        #escape-room-wrapper .lock-card.active .lock-icon-container svg { fill: var(--accent-blue); }
+
+        #escape-room-wrapper .clue-tag { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: var(--accent-green); background-color: rgba(0, 255, 102, 0.1); border: 1px dashed var(--accent-green); padding: 3px 6px; border-radius: 4px; text-align: center; margin-top: auto; display: none; }
+        #escape-room-wrapper .lock-card.unlocked .clue-tag { display: block; }
+
+        #escape-room-wrapper .challenge-container { background-color: rgba(13, 15, 18, 0.8); border: 1px solid var(--er-border-color); border-radius: 10px; padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 15px; min-height: 250px; }
+        #escape-room-wrapper .challenge-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed var(--er-border-color); padding-bottom: 10px; }
+        #escape-room-wrapper .challenge-title { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: var(--accent-blue); }
+        #escape-room-wrapper .challenge-points { font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; color: #ffcc00; }
+        #escape-room-wrapper .challenge-prompt { font-size: 0.95rem; line-height: 1.6; color: var(--text-main); }
+        #escape-room-wrapper .challenge-prompt em { color: var(--accent-blue); font-style: normal; font-weight: 600; }
+
+        /* STREAMING_CHUNK: Định dạng ô nhập liệu Escape Room */
+        #escape-room-wrapper .input-area { display: flex; gap: 10px; margin-top: auto; }
+        #escape-room-wrapper .text-input { flex: 1; background-color: #0d0f12; border: 1px solid var(--er-border-color); border-radius: 6px; padding: 12px 15px; color: #ffffff; font-size: 1rem; outline: none; transition: all 0.3s; }
+        #escape-room-wrapper .text-input:focus { border-color: var(--accent-blue); box-shadow: 0 0 8px rgba(0, 204, 255, 0.2); }
+        #escape-room-wrapper .btn-submit { background-color: var(--accent-blue); color: #000000; border: none; border-radius: 6px; padding: 0 25px; font-weight: 700; font-family: 'Orbitron', sans-serif; font-size: 0.9rem; cursor: pointer; transition: all 0.3s; text-transform: uppercase; }
+        #escape-room-wrapper .btn-submit:hover { background-color: #33d6ff; box-shadow: var(--glow-blue); }
+
+        #escape-room-wrapper .feedback-box { font-family: 'Share Tech Mono', monospace; padding: 10px 15px; border-radius: 6px; font-size: 0.9rem; display: none; line-height: 1.4; }
+        #escape-room-wrapper .feedback-error { background-color: rgba(255, 51, 51, 0.1); color: #ff8080; border: 1px solid rgba(255, 51, 51, 0.3); }
+        #escape-room-wrapper .feedback-success { background-color: rgba(0, 255, 102, 0.1); color: #80ffaa; border: 1px solid rgba(0, 255, 102, 0.3); }
+
+        /* STREAMING_CHUNK: Bàn phím cơ số và sổ tay mật mã */
+        #escape-room-wrapper .control-panel-escape { background-color: var(--panel-bg); border: 1px solid var(--er-border-color); border-radius: 12px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 20px; }
+        #escape-room-wrapper .keypad-container { background-color: #0d0f12; border: 2px solid var(--er-border-color); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 15px; align-items: center; }
+        #escape-room-wrapper .keypad-screen { background-color: #080a0d; border: 1px solid #202630; width: 100%; height: 60px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-size: 1.8rem; font-weight: 700; letter-spacing: 5px; color: #ff3333; box-shadow: inset 0 0 15px rgba(0,0,0,0.8); text-shadow: 0 0 10px rgba(255, 51, 51, 0.5); }
+        #escape-room-wrapper .keypad-screen.success { color: var(--accent-green); text-shadow: 0 0 10px rgba(0, 255, 102, 0.5); }
+        #escape-room-wrapper .keypad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 220px; }
+        #escape-room-wrapper .key-btn { background: linear-gradient(135deg, #1f2530, #13171f); border: 1px solid #3b4556; color: #ffffff; font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: 700; padding: 15px 0; border-radius: 8px; cursor: pointer; transition: all 0.1s; box-shadow: 0 3px 0 #0d1014; }
+        #escape-room-wrapper .key-btn:active { transform: translateY(3px); box-shadow: none; background: #13171f; }
+        #escape-room-wrapper .key-btn.clear { color: var(--accent-red); font-size: 0.9rem; }
+        #escape-room-wrapper .key-btn.enter { color: var(--accent-green); font-size: 0.9rem; }
+
+        #escape-room-wrapper .clues-ledger { background-color: rgba(13, 15, 18, 0.5); border: 1px solid var(--er-border-color); border-radius: 8px; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+        #escape-room-wrapper .clues-ledger-title { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; margin-bottom: 5px; }
+        #escape-room-wrapper .ledger-row { display: flex; justify-content: space-between; font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; }
+        #escape-room-wrapper .ledger-digit { color: var(--accent-green); font-weight: 700; }
+
+        /* STREAMING_CHUNK: Định dạng màn hình Overlay (Thành công / Thất bại) */
+        #escape-room-wrapper .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(13, 15, 18, 0.95); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 20px; text-align: center; display: none; }
+        #escape-room-wrapper .success-box, #escape-room-wrapper .denied-box { background-color: var(--panel-bg); border-radius: 16px; padding: 40px; max-width: 550px; width: 90%; display: flex; flex-direction: column; align-items: center; gap: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+        #escape-room-wrapper .success-box { border: 2px solid var(--accent-green); box-shadow: 0 0 30px rgba(0, 255, 102, 0.2); }
+        #escape-room-wrapper .denied-box { border: 2px solid var(--accent-red); box-shadow: 0 0 30px rgba(255, 51, 51, 0.2); }
+        #escape-room-wrapper .overlay-title { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; font-weight: 900; letter-spacing: 2px; }
+        #escape-room-wrapper .success-text { color: var(--accent-green); text-shadow: var(--glow-green); }
+        #escape-room-wrapper .denied-text { color: var(--accent-red); text-shadow: var(--glow-red); }
+        #escape-room-wrapper .overlay-desc { font-size: 1rem; line-height: 1.6; color: var(--text-main); }
+        #escape-room-wrapper .btn-action { font-family: 'Orbitron', sans-serif; font-weight: 700; padding: 12px 30px; border-radius: 6px; cursor: pointer; border: none; text-transform: uppercase; transition: all 0.3s; }
+        #escape-room-wrapper .btn-restart { background-color: var(--accent-green); color: #000000; }
+        #escape-room-wrapper .btn-restart:hover { background-color: #33ff88; box-shadow: var(--glow-green); }
+        #escape-room-wrapper .btn-retry { background-color: var(--accent-red); color: #ffffff; }
+        #escape-room-wrapper .btn-retry:hover { background-color: #ff6666; box-shadow: var(--glow-red); }
+
+        #escape-room-wrapper .door-container { width: 150px; height: 150px; border: 4px solid var(--accent-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 10px 0; box-shadow: var(--glow-green); }
+        #escape-room-wrapper .door-icon { width: 70px; height: 70px; fill: var(--accent-green); }
+
+        /* ---------------------------------------------------
+           PHẦN 2: CSS CHO TRANG LÀM BÀI KIỂM TRA (QUIZ APP)
+        ----------------------------------------------------- */
+        #quiz-app-wrapper { font-family: 'Times New Roman', Times, serif, system-ui; background-color: var(--background-color); color: var(--text-color); line-height: 1.6; padding: 15px; min-height: 100vh; display: none; }
+        #quiz-app-wrapper .container { max-width: 1000px; margin: 0 auto; background: var(--white); padding: 25px; border-radius: 8px; box-shadow: var(--shadow); border: 1px solid #e2e8f0; }
+        
+        /* STREAMING_CHUNK: Định dạng tiêu đề bài kiểm tra */
+        #quiz-app-wrapper .exam-header { display: flex; justify-content: space-between; border-bottom: 2px double var(--primary-color); padding-bottom: 15px; margin-bottom: 25px; }
+        #quiz-app-wrapper .header-left { text-align: center; width: 45%; font-size: 15px; }
+        #quiz-app-wrapper .header-left h3 { font-weight: normal; text-transform: uppercase; font-size: 14px; }
+        #quiz-app-wrapper .header-left h2 { font-size: 15px; font-weight: bold; margin-top: 5px; }
+        #quiz-app-wrapper .header-right { text-align: center; width: 50%; }
+        #quiz-app-wrapper .header-right h2 { font-size: 16px; font-weight: bold; text-transform: uppercase; color: var(--primary-color); }
+        #quiz-app-wrapper .header-right p { font-size: 14px; font-style: italic; margin-top: 5px; }
+        
+        #quiz-app-wrapper .welcome-screen { text-align: center; padding: 30px 10px; }
+        #quiz-app-wrapper .welcome-screen h1 { color: var(--primary-color); margin-bottom: 15px; font-size: 24px; }
+        #quiz-app-wrapper .welcome-screen p { margin-bottom: 25px; color: #64748b; }
+        #quiz-app-wrapper .form-group { max-width: 400px; margin: 15px auto; text-align: left; }
+        #quiz-app-wrapper .form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: var(--primary-color); }
+        #quiz-app-wrapper .form-group input { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px; font-size: 16px; font-family: inherit; }
+        
+        #quiz-app-wrapper .timer-slider-container { max-width: 400px; margin: 25px auto; text-align: left; background: #f1f5f9; padding: 15px; border-radius: 8px; border: 1px dashed var(--primary-color); }
+        #quiz-app-wrapper .timer-slider-container label { display: flex; justify-content: space-between; font-weight: bold; color: var(--primary-color); }
+        #quiz-app-wrapper .timer-slider { width: 100%; margin-top: 10px; accent-color: var(--primary-color); }
+        
+        #quiz-app-wrapper .btn { background-color: var(--primary-color); color: var(--white); border: none; padding: 12px 24px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; transition: background 0.2s, transform 0.1s; font-family: inherit; }
+        #quiz-app-wrapper .btn:hover { background-color: #1e40af; }
+        #quiz-app-wrapper .btn:active { transform: scale(0.98); }
+        
+        /* STREAMING_CHUNK: Định dạng màn hình làm bài */
+        #quiz-app-wrapper .quiz-interface { display: none; }
+        #quiz-app-wrapper .progress-bar-container { background-color: #e2e8f0; height: 8px; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
+        #quiz-app-wrapper .progress-bar { height: 100%; background-color: var(--secondary-color); width: 0%; transition: width 0.3s; }
+        #quiz-app-wrapper .quiz-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { #quiz-app-wrapper .quiz-layout { grid-template-columns: 1fr; } #quiz-app-wrapper .exam-header { flex-direction: column; align-items: center; text-align: center; gap: 15px; } #quiz-app-wrapper .header-left, #quiz-app-wrapper .header-right { width: 100%; } }
+        
+        #quiz-app-wrapper .question-card { background: var(--white); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; min-height: 350px; display: flex; flex-direction: column; justify-content: space-between; }
+        #quiz-app-wrapper .question-header { font-size: 18px; font-weight: bold; color: var(--primary-color); border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 15px; }
+        #quiz-app-wrapper .question-text { font-size: 18px; margin-bottom: 20px; line-height: 1.6; }
+        #quiz-app-wrapper .image-container { text-align: center; margin: 15px 0; }
+        
+        /* STREAMING_CHUNK: Định dạng tương tác với từng loại câu hỏi */
+        #quiz-app-wrapper .options-list { list-style-type: none; }
+        #quiz-app-wrapper .option-item { display: flex; align-items: center; padding: 12px 15px; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 10px; cursor: pointer; transition: background 0.2s, border-color 0.2s; }
+        #quiz-app-wrapper .option-item:hover { background-color: #f8fafc; border-color: #cbd5e1; }
+        #quiz-app-wrapper .option-item.selected { background-color: #eff6ff; border-color: #3b82f6; }
+        #quiz-app-wrapper .option-item input { margin-right: 12px; transform: scale(1.2); accent-color: var(--primary-color); }
+        
+        #quiz-app-wrapper .tf-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        #quiz-app-wrapper .tf-table th, #quiz-app-wrapper .tf-table td { border: 1px solid var(--border-color); padding: 10px; text-align: center; font-size: 16px; }
+        #quiz-app-wrapper .tf-table th { background-color: #f1f5f9; color: var(--primary-color); }
+        #quiz-app-wrapper .tf-table td.statement { text-align: left; width: 60%; }
+        
+        #quiz-app-wrapper .tf-btn { display: inline-block; padding: 6px 15px; margin: 0 5px; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; user-select: none; transition: all 0.2s; }
+        #quiz-app-wrapper .tf-btn.true-btn:hover { background-color: #ecfdf5; color: var(--success-color); border-color: var(--success-color); }
+        #quiz-app-wrapper .tf-btn.false-btn:hover { background-color: #fef2f2; color: var(--danger-color); border-color: var(--danger-color); }
+        #quiz-app-wrapper .tf-btn.active.true-btn { background-color: var(--success-color); color: var(--white); border-color: var(--success-color); }
+        #quiz-app-wrapper .tf-btn.active.false-btn { background-color: var(--danger-color); color: var(--white); border-color: var(--danger-color); }
+        
+        #quiz-app-wrapper .short-answer-container { margin-top: 15px; }
+        #quiz-app-wrapper .short-answer-input { width: 100%; max-width: 300px; padding: 12px; font-size: 18px; border: 2px solid var(--border-color); border-radius: 6px; font-family: inherit; outline: none; transition: border-color 0.2s; }
+        #quiz-app-wrapper .short-answer-input:focus { border-color: var(--primary-color); }
+        
+        #quiz-app-wrapper .control-panel { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; }
+        #quiz-app-wrapper .timer-display { font-size: 20px; font-weight: bold; color: var(--danger-color); text-align: center; padding: 10px; background: #fef2f2; border-radius: 6px; border: 1px solid #fecaca; margin-bottom: 15px; font-family: monospace; }
+        #quiz-app-wrapper .question-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
+        #quiz-app-wrapper .grid-btn { padding: 10px 0; background: var(--white); border: 1px solid var(--border-color); border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: all 0.2s; text-align: center; }
+        #quiz-app-wrapper .grid-btn:hover { background: #f1f5f9; }
+        #quiz-app-wrapper .grid-btn.current { border: 2px solid var(--primary-color); box-shadow: 0 0 0 2px rgba(18, 59, 117, 0.2); }
+        #quiz-app-wrapper .grid-btn.answered { background-color: #3b82f6; color: var(--white); border-color: #3b82f6; }
+        
+        #quiz-app-wrapper .navigation-buttons { display: flex; justify-content: space-between; margin-top: 20px; gap: 10px; }
+        
+        /* STREAMING_CHUNK: Định dạng màn hình Kết quả */
+        #quiz-app-wrapper .results-screen { display: none; }
+        #quiz-app-wrapper .results-header { text-align: center; margin-bottom: 30px; }
+        #quiz-app-wrapper .score-banner { display: inline-block; padding: 20px 40px; background: #eff6ff; border-radius: 50%; border: 4px solid var(--primary-color); margin-bottom: 15px; }
+        #quiz-app-wrapper .score-num { font-size: 48px; font-weight: bold; color: var(--primary-color); }
+        #quiz-app-wrapper .rating-badge { font-size: 20px; font-weight: bold; color: var(--secondary-color); background-color: var(--primary-color); padding: 8px 20px; border-radius: 20px; display: inline-block; margin-top: 10px; }
+        
+        #quiz-app-wrapper .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; }
+        @media (max-width: 480px) { #quiz-app-wrapper .stats-grid { grid-template-columns: 1fr; } }
+        #quiz-app-wrapper .stat-card { background: #f8fafc; padding: 15px; border-radius: 6px; border-left: 4px solid var(--primary-color); }
+        #quiz-app-wrapper .stat-label { font-size: 14px; color: #64748b; }
+        #quiz-app-wrapper .stat-val { font-size: 20px; font-weight: bold; color: var(--text-color); }
+        
+        #quiz-app-wrapper .analysis-section { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; margin-bottom: 30px; }
+        #quiz-app-wrapper .analysis-title { font-size: 18px; font-weight: bold; color: var(--primary-color); margin-bottom: 15px; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; }
+        #quiz-app-wrapper .analysis-list { list-style-type: none; }
+        #quiz-app-wrapper .analysis-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #e2e8f0; }
+        #quiz-app-wrapper .analysis-item.weak { color: var(--danger-color); font-weight: bold; }
+        #quiz-app-wrapper .analysis-item.strong { color: var(--success-color); }
+        
+        #quiz-app-wrapper .review-details { margin-top: 35px; }
+        #quiz-app-wrapper .review-question-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+        #quiz-app-wrapper .review-question-card.correct-card { border-left: 6px solid var(--success-color); }
+        #quiz-app-wrapper .review-question-card.incorrect-card { border-left: 6px solid var(--danger-color); }
+        #quiz-app-wrapper .status-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; color: #fff; margin-bottom: 10px; }
+        #quiz-app-wrapper .status-badge.correct { background-color: var(--success-color); }
+        #quiz-app-wrapper .status-badge.incorrect { background-color: var(--danger-color); }
+        #quiz-app-wrapper .explanation-box { background-color: #f8fafc; border-left: 3px solid var(--primary-color); padding: 10px 15px; margin-top: 15px; font-size: 15px; }
+        #quiz-app-wrapper .review-hint-box { background-color: #fffbeb; border-left: 3px solid var(--secondary-color); padding: 10px 15px; margin-top: 10px; font-size: 15px; }
+        #quiz-app-wrapper .header-info-display { font-size: 15px; background: #f1f5f9; padding: 8px 15px; border-radius: 6px; margin-bottom: 15px; display: none; justify-content: space-between; border: 1px solid #e2e8f0; }
+    </style>
+</head>
+<body>
+
+  <!-- STREAMING_CHUNK: Khởi tạo HTML Escape Room (Phòng thoát hiểm) -->
+  <div id="escape-room-wrapper">
+    <header>
+        <h1>PHÒNG THOÁT HIỂM <span>TOÁN HỌC</span></h1>
+        <div class="subtitle">NHIỆM VỤ KHỞI ĐỘNG TƯ DUY LOGIC TRƯỚC BÀI KIỂM TRA</div>
+    </header>
+
+    <section class="dashboard">
+        <div class="dash-card">
+            <div class="dash-label">Hệ thống điểm</div>
+            <div class="dash-value" id="score-val">100</div>
+        </div>
+        <div class="dash-card">
+            <div class="dash-label">Tiến trình giải mã</div>
+            <div class="dash-value" id="progress-text" style="color: var(--accent-blue); margin-bottom: 5px;">0/4 Ổ KHÓA</div>
+            <div id="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+        </div>
+        <div class="dash-card">
+            <div class="dash-label">Hệ thống âm thanh</div>
+            <button id="btn-sound-toggle" style="background: rgba(255,255,255,0.05); border: 1px solid var(--er-border-color); color: var(--accent-blue); padding: 5px 15px; border-radius: 4px; font-family: 'Share Tech Mono', monospace; cursor: pointer;">
+                ÂM THANH: ĐANG BẬT
+            </button>
+        </div>
+    </section>
+
+    <!-- STREAMING_CHUNK: Tạo HTML các Ổ khóa -->
+    <main>
+        <div class="workspace-panel">
+            <div class="panel-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Hệ thống Ổ Khóa Tư Duy
+            </div>
+
+            <div class="locks-grid">
+                <!-- Lock 1 -->
+                <div class="lock-card active" id="lock1" onclick="selectLock(1)">
+                    <div class="lock-header">
+                        <span class="lock-name">Ổ KHÓA 1</span>
+                        <span class="lock-status-badge status-locked" id="lock-status-1">Locked</span>
+                    </div>
+                    <div class="lock-icon-container">
+                        <svg viewBox="0 0 24 24" id="lock-icon-1"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                    </div>
+                    <div class="clue-tag" id="clue-tag-1">CHỮ SỐ: <span class="digit-val">?</span></div>
+                </div>
+
+                <!-- Lock 2 -->
+                <div class="lock-card" id="lock2" onclick="selectLock(2)">
+                    <div class="lock-header">
+                        <span class="lock-name">Ổ KHÓA 2</span>
+                        <span class="lock-status-badge status-locked" id="lock-status-2">Locked</span>
+                    </div>
+                    <div class="lock-icon-container">
+                        <svg viewBox="0 0 24 24" id="lock-icon-2"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                    </div>
+                    <div class="clue-tag" id="clue-tag-2">CHỮ SỐ: <span class="digit-val">?</span></div>
+                </div>
+
+                <!-- Lock 3 -->
+                <div class="lock-card" id="lock3" onclick="selectLock(3)">
+                    <div class="lock-header">
+                        <span class="lock-name">Ổ KHÓA 3</span>
+                        <span class="lock-status-badge status-locked" id="lock-status-3">Locked</span>
+                    </div>
+                    <div class="lock-icon-container">
+                        <svg viewBox="0 0 24 24" id="lock-icon-3"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                    </div>
+                    <div class="clue-tag" id="clue-tag-3">CHỮ SỐ: <span class="digit-val">?</span></div>
+                </div>
+
+                <!-- Lock 4 -->
+                <div class="lock-card" id="lock4" onclick="selectLock(4)">
+                    <div class="lock-header">
+                        <span class="lock-name">Ổ KHÓA 4</span>
+                        <span class="lock-status-badge status-locked" id="lock-status-4">Locked</span>
+                    </div>
+                    <div class="lock-icon-container">
+                        <svg viewBox="0 0 24 24" id="lock-icon-4"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                    </div>
+                    <div class="clue-tag" id="clue-tag-4">CHỮ SỐ: <span class="digit-val">?</span></div>
+                </div>
+            </div>
+
+            <!-- Bảng đề bài động -->
+            <div class="challenge-container">
+                <div class="challenge-header">
+                    <span class="challenge-title" id="chal-title">THỬ THÁCH</span>
+                    <span class="challenge-points">TRẠNG THÁI: CHƯA GIẢI</span>
+                </div>
+                <div class="challenge-prompt" id="chal-prompt">
+                    Nội dung thử thách...
+                </div>
+
+                <div class="feedback-box" id="feedback-display"></div>
+
+                <div class="input-area" id="input-control-box">
+                    <input type="text" class="text-input" id="answer-field" placeholder="Nhập câu trả lời của bạn..." onkeydown="if(event.key === 'Enter') checkAnswer()">
+                    <button class="btn-submit" onclick="checkAnswer()">Gửi</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STREAMING_CHUNK: Tạo HTML Bàn phím cơ số -->
+        <div class="control-panel-escape">
+            <div class="panel-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Nhập Mật Mã Mở Cửa
+            </div>
+
+            <div class="clues-ledger">
+                <div class="clues-ledger-title">Sổ Tay Manh Mối Thu Thập</div>
+                <div class="ledger-row">
+                    <span>Chữ số từ Ổ khóa 1:</span>
+                    <span class="ledger-digit" id="ledger-c1">-</span>
+                </div>
+                <div class="ledger-row">
+                    <span>Chữ số từ Ổ khóa 2:</span>
+                    <span class="ledger-digit" id="ledger-c2">-</span>
+                </div>
+                <div class="ledger-row">
+                    <span>Chữ số từ Ổ khóa 3:</span>
+                    <span class="ledger-digit" id="ledger-c3">-</span>
+                </div>
+                <div class="ledger-row">
+                    <span>Chữ số từ Ổ khóa 4:</span>
+                    <span class="ledger-digit" id="ledger-c4">-</span>
+                </div>
+            </div>
+
+            <div class="keypad-container">
+                <div class="keypad-screen" id="keypad-display">----</div>
+                <div class="keypad-grid">
+                    <button class="key-btn" onclick="pressKey('1')">1</button>
+                    <button class="key-btn" onclick="pressKey('2')">2</button>
+                    <button class="key-btn" onclick="pressKey('3')">3</button>
+                    <button class="key-btn" onclick="pressKey('4')">4</button>
+                    <button class="key-btn" onclick="pressKey('5')">5</button>
+                    <button class="key-btn" onclick="pressKey('6')">6</button>
+                    <button class="key-btn" onclick="pressKey('7')">7</button>
+                    <button class="key-btn" onclick="pressKey('8')">8</button>
+                    <button class="key-btn" onclick="pressKey('9')">9</button>
+                    <button class="key-btn clear" onclick="pressKey('C')">C</button>
+                    <button class="key-btn" onclick="pressKey('0')">0</button>
+                    <button class="key-btn enter" onclick="submitPasscode()">ENTER</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- STREAMING_CHUNK: Màn hình kết quả khi thoát phòng -->
+    <div class="overlay" id="overlay-success">
+        <div class="success-box">
+            <h2 class="overlay-title success-text">ESCAPE SUCCESS!</h2>
+            <div class="door-container">
+                <svg class="door-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.53c-.26-.81-1-1.4-1.9-1.4h-1v-3c0-.55-.45-1-1-1h-6v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.4z"/></svg>
+            </div>
+            <p class="overlay-desc" id="success-desc">
+                Chúc mừng bạn đã thoát phòng thành công! Toàn bộ 4 ổ khóa đã được mở. Khởi động não bộ đã xong, giờ là lúc chứng tỏ năng lực toán học của bạn!
+            </p>
+            <div style="font-family: 'Share Tech Mono', monospace; font-size: 1.4rem; color: #ffcc00; margin: 10px 0;" id="success-score">
+                ĐIỂM SỐ CHUNG CUỘC: 100/100
+            </div>
+            <button class="btn-action btn-restart" onclick="transitionToQuiz()">TIẾN VÀO LÀM BÀI KIỂM TRA</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay-denied">
+        <div class="denied-box">
+            <h2 class="overlay-title denied-text">ACCESS DENIED!</h2>
+            <div style="margin: 20px 0;">
+                <svg fill="#ff3333" width="80" height="80" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            </div>
+            <p class="overlay-desc">
+                Mật mã bạn nhập hoàn toàn không chính xác! Hãy kiểm tra lại các số liệu trong Sổ Tay Manh Mối.
+            </p>
+            <button class="btn-action btn-retry" onclick="closeDeniedOverlay()">Kiểm tra lại manh mối</button>
+        </div>
+    </div>
+  </div>
+
+  <!-- STREAMING_CHUNK: Giai đoạn 2 - HTML Bài Kiểm Tra Quiz -->
+  <div id="quiz-app-wrapper">
+    <div class="container">
+      <div class="exam-header">
+        <div class="header-left">
+          <h3>KÌ THI KHẢO SÁT CHẤT LƯỢNG HỌC TẬP</h3>
+          <h2>KIỂM TRA TẬP HỢP VÀ CÁC PHÉP TOÁN TRÊN TẬP HỢP</h2>
+          <p style="margin-top: 8px; font-size: 13px; border: 1px dashed var(--primary-color); padding: 2px; display: inline-block;">
+            (CHUẨN CẤU TRÚC 2025)
+          </p>
+        </div>
+        <div class="header-right">
+          <h2>MÔN TOÁN HỌC KHỐI 10</h2>
+          <p><b>Thời gian làm bài: 90 phút</b> (không kể thời gian phát đề)</p>
+          <p style="font-size: 12px; color: #64748b;">Hệ thống tự động đồng bộ kết quả lên Google Sheet cá nhân</p>
+        </div>
+      </div>
+
+      <div id="profile-display" class="header-info-display">
+        <span><b>Thí sinh:</b> <span id="disp-name">--</span></span>
+        <span><b>Lớp:</b> <span id="disp-class">--</span></span>
+        <span><b>STT:</b> <span id="disp-stt">--</span></span>
+      </div>
+
+      <div id="welcome-screen" class="welcome-screen">
+        <h1>ỨNG DỤNG THI THỬ TRẮC NGHIỆM TƯƠNG TÁC</h1>
+        <p>Chào mừng bạn đã vượt qua thử thách Phòng thoát hiểm. Đề thi dưới đây gồm 22 câu.</p>
+        
+        <div class="form-group">
+          <label for="student-name">Họ và tên học sinh *</label>
+          <input type="text" id="student-name" placeholder="Ví dụ: Nguyễn Văn A" required>
+        </div>
+        <div class="form-group">
+          <label for="student-class">Lớp học *</label>
+          <input type="text" id="student-class" placeholder="Ví dụ: 10A1" required>
+        </div>
+        <div class="form-group">
+          <label for="student-stt">Số thứ tự (STT) hoặc Mã số học sinh</label>
+          <input type="text" id="student-stt" placeholder="Ví dụ: 15">
+        </div>
+
+        <div class="timer-slider-container">
+          <label for="time-limit">
+            <span>Thời gian làm bài tối đa:</span>
+            <span id="slider-val">90 phút</span>
+          </label>
+          <input type="range" id="time-limit" class="timer-slider" min="5" max="90" value="90" step="5">
+          <p style="font-size: 11px; color: #64748b; margin-top: 5px; font-style: italic;">Bạn có thể kéo thanh trượt để thay đổi thời gian kiểm tra thử (tối đa 90 phút).</p>
+        </div>
+
+        <button id="start-btn" class="btn" style="font-size: 18px; padding: 15px 40px; margin-top: 15px;">BẮT ĐẦU LÀM BÀI THI</button>
+      </div>
+
+      <div id="quiz-interface" class="quiz-interface">
+        <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px; font-weight: bold; color: var(--primary-color);">
+          <span>Tiến trình hoàn thành: <span id="progress-text-quiz">0/22</span> câu</span>
+          <span>Tỉ lệ: <span id="progress-percent-quiz">0%</span></span>
+        </div>
+        <div class="progress-bar-container">
+          <div id="progress-bar-quiz" class="progress-bar"></div>
+        </div>
+
+        <!-- STREAMING_CHUNK: Bố cục hiển thị câu hỏi và bảng trả lời -->
+        <div class="quiz-layout">
+          <div class="question-column">
+            <div class="question-card">
+              <div>
+                <!-- Tiêu đề phân loại câu hỏi (Phần I, Phần II, Phần III) -->
+                <div id="section-header" style="font-size: 14px; font-weight: bold; color: #b45309; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px; border-left: 4px solid #f59e0b; padding: 5px 10px; background: #fef3c7; display: inline-block; border-radius: 0 4px 4px 0;"></div>
+                
+                <div id="question-header" class="question-header">Câu 1</div>
+                <div id="question-text" class="question-text">Nội dung câu hỏi...</div>
+                <div id="question-image" class="image-container"></div>
+                <div id="answers-container"></div>
+              </div>
+              <div class="navigation-buttons">
+                <button id="prev-btn" class="btn" style="background-color: #64748b;">&larr; Câu trước</button>
+                <button id="next-btn" class="btn">Câu tiếp theo &rarr;</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="control-panel">
+            <div>
+              <div style="font-weight: bold; color: var(--primary-color); margin-bottom: 8px; text-align: center;">THỜI GIAN CÒN LẠI</div>
+              <div id="timer" class="timer-display">90:00</div>
+              <div style="font-weight: bold; color: var(--primary-color); margin-bottom: 10px; font-size: 14px;">PHIẾU TRẢ LỜI ĐIỆN TỬ</div>
+              <div id="question-grid" class="question-grid"></div>
+            </div>
+            <button id="submit-btn" class="btn" style="background-color: var(--danger-color); width: 100%; padding: 15px; font-size: 18px; margin-top: 15px;">
+              NỘP BÀI THI &darr;
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="results-screen" class="results-screen">
+        <div class="results-header">
+          <h1 style="color: var(--primary-color); margin-bottom: 15px;">KẾT QUẢ THI KHẢO SÁT CHẤT LƯỢNG</h1>
+          <div class="score-banner">
+            <div id="score" class="score-num">0.0</div>
+            <div style="font-size: 14px; color: var(--primary-color); font-weight: bold; text-transform: uppercase;">Điểm / 10</div>
+          </div>
+          <div>
+            <div id="rating" class="rating-badge">Xếp loại: --</div>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Học sinh</div>
+            <div id="res-name" class="stat-val">Nguyễn Văn A</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Lớp học</div>
+            <div id="res-class" class="stat-val">10A1</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Số câu đã làm</div>
+            <div id="res-answered" class="stat-val">0 / 22 câu</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Tỉ lệ đúng</div>
+            <div id="res-accuracy" class="stat-val">0%</div>
+          </div>
+        </div>
+
+        <!-- STREAMING_CHUNK: Phân tích kỹ năng và hướng dẫn ôn tập -->
+        <div class="analysis-section">
+          <div class="analysis-title">PHÂN TÍCH NĂNG LỰC TOÁN HỌC THEO KỸ NĂNG CHUYÊN ĐỀ</div>
+          <div id="analysis-list" class="analysis-list"></div>
+          
+          <div id="improvement-tips" style="margin-top: 20px; padding: 15px; background-color: #fff; border-radius: 6px; border-left: 4px solid var(--secondary-color);">
+            <h4 style="color: var(--primary-color); margin-bottom: 8px;">Đề xuất hướng ôn tập tiếp theo:</h4>
+            <div id="tips-content" style="font-size: 15px; line-height: 1.5;">Hệ thống đang tổng hợp dữ liệu bài làm...</div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 15px; margin-bottom: 30px; justify-content: center;">
+          <a href="#detailed-answers-anchor" class="btn" style="text-decoration: none; text-align: center; line-height: 1.4;">XEM ĐÁP ÁN CHI TIẾT &darr;</a>
+        </div>
+
+        <div id="detailed-answers-anchor" style="height: 1px; margin-top: 10px;"></div>
+        
+        <div class="review-details">
+          <h2 style="color: var(--primary-color); margin-bottom: 20px; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px;">
+            BẢNG TRA CỨU ĐÁP ÁN CHI TIẾT VÀ GIẢI THÍCH SƯ PHẠM
+          </h2>
+          <div id="review-cards-container"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // MODULE 1: ESCAPE ROOM JAVASCRIPT LOGIC
+    // ==========================================
+    let escapeScore = 100;
+    let activeLock = 1;
+    let isSoundOn = true;
+    let passcodeEntered = "";
+    let dynamicPasscode = ""; 
+
+    /* STREAMING_CHUNK: Khai báo nội dung câu hỏi logic Phòng Thoát Hiểm */
+    const locks = {
+        1: {
+            id: 1,
+            title: "THỬ THÁCH 1: TRÍ LỰC LOÀI MÈO",
+            prompt: `Một bài toán suy luận kinh điển: <br><br>
+            Có 3 con mèo bắt được 3 con chuột trong vòng đúng 3 phút. <br>
+            <strong>Yêu cầu:</strong> Giả sử tốc độ bắt chuột của các con mèo là như nhau, hỏi cần bao nhiêu con mèo để bắt được 100 con chuột trong 100 phút? (Nhập đáp án là một con số).`,
+            answers: ["3"],
+            unlocked: false,
+            clueDigit: "0",
+            hint: "Manh mối: 3 con mèo bắt 3 con chuột trong 3 phút, nghĩa là trung bình mỗi con mèo mất 3 phút để bắt 1 con chuột. Vậy 1 con mèo trong 100 phút bắt được bao nhiêu con chuột?"
+        },
+        2: {
+            id: 2,
+            title: "THỬ THÁCH 2: NGHỆ THUẬT GIAO TIẾP",
+            prompt: `Đây là một câu đố không có mẹo: <br><br> Có bao nhiêu con giáp?`,
+            answers: ["11"],
+            unlocked: false,
+            clueDigit: "0",
+            hint: "Manh mối: Người thứ nhất bắt tay 4 người. Người thứ hai bắt tay 3 người (không tính người thứ nhất nữa)... Hoặc dùng công thức Tổ hợp chập 2 của 5."
+        },
+        3: {
+            id: 3,
+            title: "THỬ THÁCH 3: TÌM TỪ KHÓA",
+            prompt: `Hãy điền một chữ cái CÒN THIẾU vào phát biểu Toán học sau đây: <br><br>
+            "Tập hợp các số thực được kí hiệu bằng chữ cái in hoa là: ___" (Chỉ nhập 1 chữ cái).`,
+            answers: ["r"],
+            unlocked: false,
+            clueDigit: "0",
+            hint: "Manh mối: Tập hợp số tự nhiên là N, số nguyên là Z, số hữu tỉ là Q. Tập số lớn nhất các bạn đang học là tập số gì?"
+        },
+        4: {
+            id: 4,
+            title: "THỬ THÁCH 4: TOÁN HỌC TỐC ĐỘ",
+            prompt: `Hãy tính nhanh bài toán sau trong đầu (Không dùng máy tính): <br><br>
+            <strong>Một nửa của một phần tư của 400 là bao nhiêu?</strong>`,
+            answers: ["50"],
+            unlocked: false,
+            clueDigit: "0",
+            hint: "Manh mối: Tính từ dưới lên. Một phần tư của 400 là bao nhiêu? Sau đó lấy một nửa của kết quả đó."
+        }
+    };
+
+    // Khởi tạo mã ngẫu nhiên
+    for (let i = 1; i <= 4; i++) {
+        locks[i].clueDigit = Math.floor(Math.random() * 10).toString(); 
+        dynamicPasscode += locks[i].clueDigit; 
+    }
+
+    /* STREAMING_CHUNK: Quản lý âm thanh bằng Web Audio API */
+    let audioCtx = null;
+    function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+
+    function playSound(type) {
+        if (!isSoundOn) return;
+        try {
+            initAudio(); const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            if (type === 'click') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(600, audioCtx.currentTime); gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1); osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'unlock') {
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); osc.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.3); gain.gain.setValueAtTime(0.15, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5); osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+            } else if (type === 'error') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(120, audioCtx.currentTime); gain.gain.setValueAtTime(0.2, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4); osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+            } else if (type === 'victory') {
+                const osc2 = audioCtx.createOscillator(); const gain2 = audioCtx.createGain(); osc2.connect(gain2); gain2.connect(audioCtx.destination);
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(80, audioCtx.currentTime); osc.frequency.linearRampToValueAtTime(150, audioCtx.currentTime + 1.5); gain.gain.setValueAtTime(0.3, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
+                osc2.type = 'sine'; osc2.frequency.setValueAtTime(523.25, audioCtx.currentTime); osc2.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.3); osc2.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.6); osc2.frequency.setValueAtTime(1046.50, audioCtx.currentTime + 0.9); gain2.gain.setValueAtTime(0.2, audioCtx.currentTime); gain2.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 1.8);
+                osc.start(); osc2.start(); osc.stop(audioCtx.currentTime + 1.8); osc2.stop(audioCtx.currentTime + 1.8);
+            }
+        } catch (e) { console.log("Audio failed to load", e); }
+    }
+
+    document.getElementById('btn-sound-toggle').addEventListener('click', function() {
+        isSoundOn = !isSoundOn; this.textContent = isSoundOn ? "ÂM THANH: ĐANG BẬT" : "ÂM THANH: ĐANG TẮT"; this.style.color = isSoundOn ? "var(--accent-blue)" : "var(--text-muted)"; playSound('click');
+    });
+
+    /* STREAMING_CHUNK: Trình xử lý logic chọn và trả lời ổ khóa */
+    function selectLock(num) {
+        playSound('click'); activeLock = num;
+        for (let i = 1; i <= 4; i++) { document.getElementById(`lock${i}`).classList.remove('active'); }
+        document.getElementById(`lock${num}`).classList.add('active');
+
+        const chal = locks[num];
+        document.getElementById('chal-title').innerHTML = chal.title;
+        document.getElementById('chal-prompt').innerHTML = chal.prompt;
+        
+        const feedbackBox = document.getElementById('feedback-display');
+        const answerField = document.getElementById('answer-field');
+        const inputArea = document.getElementById('input-control-box');
+
+        if (chal.unlocked) {
+            feedbackBox.style.display = "block"; feedbackBox.className = "feedback-box feedback-success";
+            feedbackBox.innerHTML = `MỞ KHÓA THÀNH CÔNG! Chữ số bí mật nhận được là: <strong style="font-size: 1.25rem; font-family: Orbitron">${chal.clueDigit}</strong>`;
+            inputArea.style.display = "none";
+        } else {
+            feedbackBox.style.display = "none"; inputArea.style.display = "flex"; answerField.value = ""; answerField.placeholder = "Nhập câu trả lời cho Thử thách " + num + "...";
+        }
+    }
+
+    window.onload = function() { selectLock(1); };
+
+    function checkAnswer() {
+        const val = document.getElementById('answer-field').value.trim().toLowerCase();
+        const chal = locks[activeLock]; const feedbackBox = document.getElementById('feedback-display');
+        if (val === "") return;
+
+        if (chal.answers.includes(val)) {
+            chal.unlocked = true; playSound('unlock');
+            feedbackBox.style.display = "block"; feedbackBox.className = "feedback-box feedback-success";
+            feedbackBox.innerHTML = `CHÍNH XÁC! Ổ khóa số ${activeLock} đã được mở tung! <br>Chữ số mật mã thu được là: <strong style="font-size: 1.3rem; font-family: Orbitron; color: var(--accent-green)">${chal.clueDigit}</strong>`;
+            document.getElementById('input-control-box').style.display = "none";
+            const card = document.getElementById(`lock${activeLock}`); card.classList.add('unlocked');
+            document.getElementById(`lock-status-${activeLock}`).className = "lock-status-badge status-unlocked"; document.getElementById(`lock-status-${activeLock}`).textContent = "Unlocked"; document.getElementById(`clue-tag-${activeLock}`).querySelector('.digit-val').textContent = chal.clueDigit;
+            document.getElementById(`ledger-c${activeLock}`).textContent = chal.clueDigit;
+            updateEscapeProgress();
+        } else {
+            playSound('error'); escapeScore = Math.max(0, escapeScore - 10); document.getElementById('score-val').textContent = escapeScore;
+            feedbackBox.style.display = "block"; feedbackBox.className = "feedback-box feedback-error"; feedbackBox.innerHTML = `SAI RỒI! <br>${chal.hint}`;
+        }
+    }
+
+    function updateEscapeProgress() {
+        let solvedCount = 0;
+        for (let i = 1; i <= 4; i++) { if (locks[i].unlocked) solvedCount++; }
+        const pct = (solvedCount / 4) * 100;
+        document.getElementById('progress-bar').style.width = pct + "%"; document.getElementById('progress-text').textContent = `${solvedCount}/4 Ổ KHÓA`;
+    }
+
+    /* STREAMING_CHUNK: Trình xử lý bàn phím cơ số và hoàn tất phòng thoát hiểm */
+    function pressKey(char) {
+        playSound('click'); const display = document.getElementById('keypad-display');
+        if (char === 'C') { passcodeEntered = ""; display.textContent = "----"; } 
+        else { if (passcodeEntered.length < 4) { passcodeEntered += char; display.textContent = passcodeEntered.padEnd(4, '-'); } }
+    }
+
+    function submitPasscode() {
+        const display = document.getElementById('keypad-display');
+        let allSolved = true;
+        for (let i = 1; i <= 4; i++) { if (!locks[i].unlocked) allSolved = false; }
+        if (!allSolved) { playSound('error'); alert("Chú ý: Bạn phải mở khóa thành công cả 4 ổ khóa để thu thập đủ 4 chữ số bí mật trước khi nhập mật mã!"); return; }
+
+        if (passcodeEntered === dynamicPasscode) {
+            playSound('victory'); display.className = "keypad-screen success";
+            setTimeout(() => { document.getElementById('success-score').textContent = `ĐIỂM SỐ CHUNG CUỘC: ${escapeScore}/100`; document.getElementById('overlay-success').style.display = "flex"; }, 500);
+        } else {
+            playSound('error'); document.getElementById('overlay-denied').style.display = "flex";
+        }
+    }
+
+    function closeDeniedOverlay() {
+        playSound('click'); document.getElementById('overlay-denied').style.display = "none"; passcodeEntered = ""; document.getElementById('keypad-display').textContent = "----";
+    }
+
+    function transitionToQuiz() {
+        playSound('click'); document.getElementById('escape-room-wrapper').style.display = 'none'; document.getElementById('quiz-app-wrapper').style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ==========================================
+    // MODULE 2: QUIZ JAVASCRIPT LOGIC
+    // ==========================================
+
+    /* STREAMING_CHUNK: Dữ liệu 22 câu hỏi Bài thi Toán 10 (Tập Hợp) */
+    const questions = [
+      {
+        id: 1, type: "single", level: "Nhận biết", skill: "Xác định tập hợp",
+        question: "Hãy liệt kê các phần tử của tập hợp $X=\\{x\\in\\mathbb{Z}|2x^{2}-3x+1=0\\}$.",
+        options: ["A. $X=\\{0\\}$", "B. $X=\\{1\\}$", "C. $X=\\{1;\\frac{1}{2}\\}$", "D. $X=\\{1;\\frac{3}{2}\\}$"],
+        correctAnswer: 1, 
+        explanation: "Giải phương trình $2x^2 - 3x + 1 = 0$, ta được hai nghiệm $x = 1$ và $x = \\frac{1}{2}$. Vì điều kiện của tập hợp yêu cầu $x \\in \\mathbb{Z}$ (số nguyên), nên ta chỉ nhận phần tử $x = 1$. Vậy $X = \\{1\\}$.",
+        reviewHint: "Chú ý điều kiện của phần tử (số thực $\\mathbb{R}$, số nguyên $\\mathbb{Z}$, hay số tự nhiên $\\mathbb{N}$) trước khi kết luận nghiệm."
+      },
+      {
+        id: 2, type: "single", level: "Nhận biết", skill: "Số tập con",
+        question: "Cho tập hợp $A=\\{a,b,c,d\\}$. Tìm số tập con của tập A.",
+        options: ["A. 16.", "B. 15.", "C. 12.", "D. 10."],
+        correctAnswer: 0, 
+        explanation: "Tập hợp A có $n = 4$ phần tử. Số tập con của một tập hợp có $n$ phần tử được tính bằng công thức $2^n$. Suy ra số tập con của A là $2^4 = 16$.",
+        reviewHint: "Công thức tính nhanh số tập con của một tập hợp là $2^n$."
+      },
+      {
+        id: 3, type: "single", level: "Thông hiểu", skill: "Hai tập hợp bằng nhau",
+        question: "Tìm $x, y$ để ba tập hợp $A=\\{1;4\\}$, $B=\\{4;x\\}$ và $C=\\{x;y;4\\}$ bằng nhau.",
+        options: ["A. $x=y=1$.", "B. $x=y=1$ hoặc $x=1, y=4$.", "C. $x=1, y=4$.", "D. $x=4, y=1$ hoặc $x=y=4$."],
+        correctAnswer: 0, 
+        explanation: "Để $A = B$ thì phần tử còn thiếu trong B phải là phần tử của A, tức là $x = 1$. Khi đó $A = \\{1; 4\\}$. Để $A = C$ thì các phần tử của C cũng phải giống hệt A, thay $x=1$ vào C ta được $C = \\{1; y; 4\\}$. Vì C là tập hợp (các phần tử phân biệt) và bằng A nên $y$ bắt buộc phải bằng 1 (thực chất tập $\\{1; 1; 4\\}$ chính là tập $\\{1; 4\\}$). Do đó $x = y = 1$.",
+        reviewHint: "Hai tập hợp bằng nhau khi và chỉ khi mọi phần tử của tập này đều là phần tử của tập kia và ngược lại."
+      },
+      {
+        id: 4, type: "single", level: "Nhận biết", skill: "Giao của hai tập hợp",
+        question: "Cho $S=\\{7;2;8;4;9;12\\}$; $T=\\{1;3;7;4\\}$. Tìm tập $S\\cap T$.",
+        options: ["A. {1;2;3;4;8;9;7;12}.", "B. {2;8;9;12}.", "C. {4;7}.", "D. {1;3}."],
+        correctAnswer: 2, 
+        explanation: "Phép giao $\\cap$ lấy các phần tử CHUNG của cả hai tập hợp. Ta thấy phần tử $4$ và $7$ đều xuất hiện trong cả $S$ và $T$. Vậy $S\\cap T = \\{4; 7\\}$.",
+        reviewHint: "Kí hiệu $\\cap$ giống chữ 'n' trong từ 'nhặt', nghĩa là 'nhặt' những phần tử chung."
+      },
+      {
+        id: 5, type: "single", level: "Thông hiểu", skill: "Các phép toán trên tập số thực",
+        question: "Cho hai tập hợp $A=[-5;3)$, $B=(1;+\\infty)$. Khi đó $A\\cap B$ là tập nào sau đây?",
+        options: ["A. (1;3)", "B. (1;3]", "C. $[-5;+\\infty)$", "D. [-5;1]"],
+        correctAnswer: 0, 
+        explanation: "Biểu diễn trên trục số, khoảng giao nhau giữa $[-5; 3)$ và $(1; +\\infty)$ là từ $1$ đến $3$. Tại $1$ là ngoặc tròn (không lấy 1), tại $3$ là ngoặc tròn (không lấy 3). Do đó kết quả là $(1; 3)$.",
+        reviewHint: "Biểu diễn 2 tập hợp lên trục số, gạch bỏ các phần không thuộc tập hợp, phần không bị gạch ở CẢ HAI tập chính là giao."
+      },
+      {
+        id: 6, type: "single", level: "Nhận biết", skill: "Hợp của hai tập hợp",
+        question: "Cho 2 tập hợp: $S=\\{1;3;5;8\\}$; $T=\\{3;5;7;9\\}$. Tập hợp $S\\cup T$ bằng tập hợp nào sau đây?",
+        options: ["A. {3;5}.", "B. {1;3;5;7;8;9}.", "C. {1;7;9}.", "D. {1;3;5}."],
+        correctAnswer: 1, 
+        explanation: "Phép hợp $\\cup$ lấy TẤT CẢ các phần tử của cả hai tập hợp, những phần tử trùng nhau thì chỉ viết 1 lần. Kết quả: $\\{1; 3; 5; 7; 8; 9\\}$.",
+        reviewHint: "Kí hiệu $\\cup$ giống cái 'cốc', nghĩa là hứng/gộp tất cả các phần tử lại với nhau."
+      },
+      {
+        id: 7, type: "single", level: "Thông hiểu", skill: "Các phép toán trên tập số thực",
+        question: "Cho hai tập hợp $A=[-2;7)$, $B=(1;9]$. Tìm tập hợp $A\\cup B$.",
+        options: ["A. (1;7)", "B. [-2;9]", "C. $[-2;1)$", "D. (7;9]"],
+        correctAnswer: 1, 
+        explanation: "Biểu diễn trên trục số, ta lấy toàn bộ khu vực từ điểm nhỏ nhất của hai tập đến điểm lớn nhất của hai tập vì khoảng $(1; 7)$ là phần chung nối liền hai tập hợp. Do đó hợp của chúng là một đoạn liền mạch: $[-2; 9]$.",
+        reviewHint: "Hợp của hai khoảng/đoạn trên trục số là khoảng trải dài từ giá trị nhỏ nhất đến giá trị lớn nhất (nếu chúng giao nhau)."
+      },
+      {
+        id: 8, type: "single", level: "Nhận biết", skill: "Hiệu của hai tập hợp",
+        question: "Cho hai tập hợp $A=\\{2,4,6,9\\}$ và $B=\\{1,2,3,4\\}$. Tập hợp $A\\setminus B$ bằng tập nào sau đây?",
+        options: ["A. $A=\\{1,2,3,5\\}$.", "B. {1;3;6;9}.", "C. {6;9}.", "D. $\\emptyset$."],
+        correctAnswer: 2, 
+        explanation: "Phép hiệu $A \\setminus B$ nghĩa là lấy các phần tử thuộc A nhưng KHÔNG thuộc B. Tập A có các phần tử $2$ và $4$ bị trùng với B nên ta bỏ đi. Còn lại $6$ và $9$. Kết quả: $\\{6; 9\\}$.",
+        reviewHint: "Hiệu $A \\setminus B$ là lấy tập A, xong xóa đi những phần tử nào nằm trong tập B."
+      },
+      {
+        id: 9, type: "single", level: "Thông hiểu", skill: "Các phép toán trên tập số thực",
+        question: "Cho hai tập hợp $A=(1;5]$, $B=(2;7]$. Tập hợp $A\\setminus B$ là:",
+        options: ["A. (1;2]", "B. (2;5)", "C. (-1;7]", "D. (-1;2)"],
+        correctAnswer: 0, 
+        explanation: "Biểu diễn trên trục số, ta lấy khoảng $(1; 5]$ và gạch bỏ đi phần $(2; 7]$. Phần bị gạch bắt đầu từ lớn hơn 2. Do đó, điểm 2 KHÔNG bị gạch. Phần còn lại của A là $(1; 2]$.",
+        reviewHint: "Khi làm phép trừ khoảng/đoạn, tại vị trí biên bị trừ, ngoặc sẽ bị đảo ngược (Ngoặc tròn thành vuông, vuông thành tròn)."
+      },
+      {
+        id: 10, type: "single", level: "Nhận biết", skill: "Phần bù của tập hợp",
+        question: "Cho tập hợp $A=(2;+\\infty)$. Tìm tập hợp $C_{\\mathbb{R}}A$.",
+        options: ["A. $[2;+\\infty)$", "B. $(2;+\\infty)$", "C. $(-\\infty;2]$", "D. $(-\\infty;-2]$"],
+        correctAnswer: 2, 
+        explanation: "Phần bù $C_{\\mathbb{R}}A$ chính là $\\mathbb{R} \\setminus A$. Lấy trục số thực gạch bỏ đi phần từ $(2; +\\infty)$. Phần bị bỏ không chứa số $2$ (vì ngoặc tròn), do đó phần còn lại sẽ chứa số $2$. Kết quả: $(-\\infty; 2]$.",
+        reviewHint: "Phần bù của một khoảng/đoạn chứa vô cực chính là phần ngược lại trên trục số. Nhớ đảo ngoặc tại vị trí biên."
+      },
+      {
+        id: 11, type: "single", level: "Vận dụng", skill: "Bài toán tham số tập hợp",
+        question: "Cho hai tập hợp $A=(m;m+1)$ và $B=[-1;3]$. Tìm tất cả các giá trị của m để $A\\cap B=\\emptyset$.",
+        options: ["A. $\\left[\\begin{array}{l}m \\le -2 \\\\ m \\ge 3\\end{array}\\right.$", "B. $-2 \\le m \\le 3$.", "C. $\\left[\\begin{array}{l}m \\ge 2 \\\\ m \\le -1\\end{array}\\right.$", "D. $\\left[\\begin{array}{l}m < -2 \\\\ m > 3\\end{array}\\right.$"],
+        correctAnswer: 0, 
+        explanation: "Để $A \\cap B = \\emptyset$ (không có điểm chung), khoảng $A$ phải nằm hoàn toàn bên trái hoặc hoàn toàn bên phải đoạn $B$. <br>TH1: Nằm bên trái $B \\Rightarrow m+1 \\le -1 \\Rightarrow m \\le -2$.<br>TH2: Nằm bên phải $B \\Rightarrow m \\ge 3$.<br>Vậy kết hợp lại ta có: $m \\le -2$ hoặc $m \\ge 3$.",
+        reviewHint: "Vẽ trục số, đặt cố định đoạn $B$. Di chuyển khoảng $A$ sang 2 mép của $B$ để xác định bất phương trình."
+      },
+      {
+        id: 12, type: "single", level: "Vận dụng", skill: "Toán thực tế tập hợp (Biểu đồ Venn)",
+        question: "Lớp 10A có 7 học sinh giỏi Toán, 5 học sinh giỏi Vật lí, 6 học sinh giỏi Hóa học, 3 học sinh giỏi cả Toán và Vật lí, 4 học sinh giỏi cả Toán và Hóa học, 2 học sinh giỏi cả Vật lí và Hóa học, 1 học sinh giỏi cả ba môn. Tính số học sinh giỏi ít nhất một môn của lớp 10A.",
+        options: ["A. 10.", "B. 20.", "C. 17.", "D. 9."],
+        correctAnswer: 0, 
+        explanation: "Gọi $T, L, H$ là tập hợp học sinh giỏi Toán, Lý, Hóa. Số học sinh giỏi ít nhất một môn là số phần tử của tập hợp $T \\cup L \\cup H$. Áp dụng công thức biểu đồ Venn 3 vòng: <br>$n(T \\cup L \\cup H) = n(T) + n(L) + n(H) - n(T \\cap L) - n(T \\cap H) - n(L \\cap H) + n(T \\cap L \\cap H)$ <br>$= 7 + 5 + 6 - 3 - 4 - 2 + 1 = 10$.",
+        reviewHint: "Công thức bao hàm - loại trừ: Cộng các tập đơn, trừ các phần giao đôi, cộng lại phần giao ba."
+      },
+
+      /* STREAMING_CHUNK: Dữ liệu câu hỏi Đúng/Sai */
+      {
+        id: 13, type: "tf", level: "Thông hiểu", skill: "Phép toán tập hợp hữu hạn",
+        question: "Cho hai tập hợp $A=\\{0;1;2;3;4\\}$, $B=\\{3;4;5;6\\}$. Các mệnh đề sau đúng hay sai?",
+        subQuestions: [
+          { text: "a) $A\\cup B=\\{0;1;2;3;4;5;6\\}$.", correctAnswer: "D" },
+          { text: "b) $A\\cap B=\\{5;6\\}$.", correctAnswer: "S" },
+          { text: "c) $B\\setminus A=\\{0;1;2\\}$.", correctAnswer: "S" },
+          { text: "d) $(A\\cup B)\\setminus (A\\cap B) = (A\\setminus B)\\cup (B\\setminus A)$.", correctAnswer: "D" }
+        ],
+        explanation: "a) ĐÚNG: Hợp của hai tập hợp lấy tất cả các phần tử là $\\{0;1;2;3;4;5;6\\}$.<br><br>b) SAI: Giao của hai tập hợp là các phần tử chung, vậy $A \\cap B = \\{3;4\\}$ chứ không phải $\\{5;6\\}$.<br><br>c) SAI: Phép trừ $B \\setminus A$ lấy các phần tử có trong B mà không có trong A. Bỏ đi số $3, 4$ trùng lặp, ta được $\\{5;6\\}$.<br><br>d) ĐÚNG: Tính vế trái: $A \\cup B = \\{0;1;2;3;4;5;6\\}$, $A \\cap B = \\{3;4\\} \\Rightarrow$ Vế trái = $\\{0;1;2;5;6\\}$. Tính vế phải: $A \\setminus B = \\{0;1;2\\}$, $B \\setminus A = \\{5;6\\} \\Rightarrow$ Vế phải = $\\{0;1;2\\} \\cup \\{5;6\\} = \\{0;1;2;5;6\\}$. Hai vế bằng nhau.",
+        reviewHint: "Thực hiện tính toán từng vế một cách cẩn thận để đối chiếu kết quả cho câu hỏi dạng biểu thức."
+      },
+     {
+        id: 14, type: "tf", level: "Vận dụng", skill: "Phép toán trên tập số thực",
+        question: "Cho các tập hợp $A=[-3;1)$, $B=[0;5)$, $C=[a;a+3]$. Các mệnh đề sau đúng hay sai?",
+        subQuestions: [
+          { text: "a) $A\\cup B=[0;1)$.", correctAnswer: "S" },
+          { text: "b) $A\\cap B=[-3;5)$.", correctAnswer: "S" },
+          { text: "c) $B\\setminus A=[1;5)$.", correctAnswer: "D" },
+          { text: "d) $A\\cap C \\neq \\emptyset\\Leftrightarrow -6\\le a < 1$.", correctAnswer: "D" }
+        ],
+        explanation: "a) SAI: $A \\cup B = [-3; 1) \\cup [0; 5) = [-3; 5)$. Đáp án $[0;1)$ là kết quả của phép GIAO, không phải phép HỢP.<br><br>b) SAI: $A \\cap B = [0; 1)$. Đáp án $[-3;5)$ là kết quả của phép HỢP, không phải phép GIAO.<br><br>c) ĐÚNG: Tập $B$ từ $0$ đến $5$, gạch đi phần thuộc $A$ (từ $-3$ đến $1$, ngoặc tròn tại $1$). Khi trừ khoảng chứa biên tròn, biên bị trừ sẽ biến thành vuông. Vậy phần còn lại của $B$ là $[1; 5)$.<br><br>d) ĐÚNG: Thay vì tìm trực tiếp, ta tìm điều kiện để $A \\cap C = \\emptyset$. Điều này xảy ra khi tập $C$ nằm hoàn toàn bên trái $A$ (tức $a+3 < -3 \\Leftrightarrow a < -6$) hoặc tập $C$ nằm hoàn toàn bên phải $A$ (tức $a \\ge 1$). Lấy phần bù (phủ định lại), để $A \\cap C \\neq \\emptyset$ thì $-6 \\le a < 1$.",
+        reviewHint: "Để tìm điều kiện hai tập hợp giao nhau khác rỗng, mẹo tính nhanh là hãy tìm điều kiện để chúng giao nhau BẰNG rỗng (rất dễ nhìn trên trục số), sau đó lấy phần bù (phủ định) của kết quả vừa tìm được."
+      },
+      {
+        id: 15, type: "tf", level: "Vận dụng", skill: "Phép toán tập hợp chứa tham số",
+        question: "Cho ba tập hợp $A=(1;\\frac{11}{2})$, $B=[-2;3]$ và $C=(\\frac{m-1}{3};+\\infty)$. Các mệnh đề sau đúng hay sai?",
+        subQuestions: [
+          { text: "a) Giao của hai tập hợp A và B là $(1;3]$.", correctAnswer: "D" },
+          { text: "b) Tập hợp $B\\cap \\mathbb{N}$ gồm 6 phần tử.", correctAnswer: "S" },
+          { text: "c) Tập hợp $\\mathbb{R}\\setminus A=(-\\infty;1]\\cup[\\frac{11}{2};+\\infty)$.", correctAnswer: "D" },
+          { text: "d) Tổng các giá trị nguyên của m để $B\\cap C$ có đúng 3 phần tử là số nguyên bằng 6.", correctAnswer: "D" }
+        ],
+        explanation: "a) ĐÚNG: Giao của $(1; 5.5)$ và $[-2; 3]$ là $(1; 3]$.<br><br>b) SAI: $\\mathbb{N}$ là tập số tự nhiên (không chứa số âm). Các số tự nhiên thuộc đoạn $[-2; 3]$ là $\\{0; 1; 2; 3\\}$, chỉ có 4 phần tử chứ không phải 6.<br><br>c) ĐÚNG: Phép trừ khỏi $\\mathbb{R}$ chính là phần bù. Khoảng $A = (1; 5.5)$ có ngoặc tròn, nên phần bù là $(-\\infty; 1] \\cup [5.5; +\\infty)$ (sử dụng ngoặc vuông).<br><br>d) ĐÚNG: Tập $B$ có các phần tử nguyên là $\\{-2; -1; 0; 1; 2; 3\\}$. Để giao $B \\cap C$ có đúng 3 số nguyên, 3 số nguyên đó bắt buộc phải nằm ở đuôi phải của B (do C trải dài ra vô cực dương), tức là $\\{1; 2; 3\\}$. Do đó, biên trái của C phải nằm giữa 0 và 1, bao gồm cả 0 (do C dùng ngoặc tròn, không chứa biên). Ta có: $0 \\le \\frac{m-1}{3} < 1 \\Leftrightarrow 0 \\le m-1 < 3 \\Leftrightarrow 1 \\le m < 4$. Các giá trị nguyên của $m$ là $\\{1; 2; 3\\}$. Tổng = $1 + 2 + 3 = 6$.",
+        reviewHint: "Đối với bài toán giao tập hợp đếm số lượng số nguyên, hãy đếm cụ thể các số nguyên có trong tập cố định trước, sau đó ép khoảng điều kiện cho tham số chạy."
+      },
+      {
+        id: 16, type: "tf", level: "Vận dụng", skill: "Toán thực tế (Biểu đồ Venn)",
+        question: "Lớp 10A có 26 học sinh biết chơi đá bóng, 22 học sinh biết chơi cầu lông, 5 học sinh biết chơi cả hai môn đá bóng và cầu lông, 8 học sinh không biết chơi môn nào. Các mệnh đề sau đúng hay sai?",
+        subQuestions: [
+          { text: "a) Số học sinh chỉ biết chơi cầu lông mà không biết chơi đá bóng là 17.", correctAnswer: "D" },
+          { text: "b) Số học sinh chỉ biết chơi đá bóng mà không biết chơi cầu lông là 20.", correctAnswer: "S" },
+          { text: "c) Số học sinh biết chơi ít nhất một trong hai môn đá bóng hoặc cầu lông là 43.", correctAnswer: "D" },
+          { text: "d) Sĩ số lớp 10A là 61.", correctAnswer: "S" }
+        ],
+        explanation: "Vẽ biểu đồ Venn, vùng giao nhau (cả 2 môn) là 5 học sinh.<br><br>a) ĐÚNG: Chỉ cầu lông = Tổng cầu lông - Cả 2 môn = $22 - 5 = 17$ học sinh.<br><br>b) SAI: Chỉ đá bóng = Tổng đá bóng - Cả 2 môn = $26 - 5 = 21$ học sinh. (Phát biểu ghi là 20 nên Sai).<br><br>c) ĐÚNG: Ít nhất 1 môn = (Chỉ đá bóng) + (Chỉ cầu lông) + (Cả hai môn) = $21 + 17 + 5 = 43$ học sinh.<br><br>d) SAI: Sĩ số lớp = (Số học sinh chơi ít nhất 1 môn) + (Số học sinh không chơi môn nào) = $43 + 8 = 51$ học sinh. (Phát biểu ghi 61 là Sai).",
+        reviewHint: "Luôn luôn phân biệt rõ ràng cụm từ 'chơi môn A' (bao gồm cả những người chơi môn B) và 'CHỈ chơi môn A' (đã trừ đi những người chơi môn B)."
+      },
+
+      /* STREAMING_CHUNK: Dữ liệu câu hỏi Trả Lời Ngắn */
+      {
+        id: 17, type: "short", level: "Vận dụng", skill: "Giải bất phương trình và tập hợp",
+        question: "Cho tập hợp $A=\\{x\\in\\mathbb{R}: (2x-11)(x^2+3) \\le 0\\}$. Số phần tử của $A\\cap\\mathbb{N}$ bằng bao nhiêu?",
+        correctAnswer: "6",
+        explanation: "Ta có phương trình: $(2x-11)(x^2+3) \\le 0$. <br>Vì $x^2 + 3 > 0$ với mọi số thực $x$, nên để tích này $\\le 0$ thì bắt buộc $2x - 11 \\le 0 \\Leftrightarrow x \\le \\frac{11}{2} = 5.5$. <br>Tập $A = (-\\infty; 5.5]$. <br>Giao với tập số tự nhiên $\\mathbb{N}$ (các số nguyên không âm), ta được các giá trị $\\{0; 1; 2; 3; 4; 5\\}$. Vậy có tất cả 6 phần tử.",
+        reviewHint: "Đừng quên số 0 cũng là một số tự nhiên."
+      },
+      {
+        id: 18, type: "short", level: "Thông hiểu", skill: "Phép toán tập hợp hỗn hợp",
+        question: "Cho hai tập hợp $A=(0;5]$ và $B=\\{-2;1;3;6\\}$. Số phần tử của $(A\\cup B)\\cap\\mathbb{Z}$ bằng bao nhiêu?",
+        correctAnswer: "7",
+        explanation: "Bước 1: Tìm $A \\cup B = \\{-2\\} \\cup (0; 5] \\cup \\{6\\}$. Đây là một tập hợp chứa các phần tử rời rạc và 1 đoạn liên tục. <br>Bước 2: Tìm giao với tập số nguyên $\\mathbb{Z}$. Các số nguyên nằm trong $(A \\cup B)$ bao gồm: $-2$ (từ B), $1, 2, 3, 4, 5$ (từ A) và $6$ (từ B). <br>Vậy các phần tử là $\\{-2; 1; 2; 3; 4; 5; 6\\}$. Tổng cộng có 7 phần tử.",
+        reviewHint: "Liệt kê cẩn thận các số nguyên nằm trong nửa khoảng $(0; 5]$, nhớ loại số 0 vì là ngoặc tròn."
+      },
+      {
+        id: 19, type: "short", level: "Vận dụng cao", skill: "Tập hợp chứa tham số khó",
+        question: "Cho các tập hợp $A=\\{x\\in\\mathbb{Q}: (x-1)(3x-2)(x+\\sqrt{2})=0\\}$ và $B=\\{x\\in\\mathbb{R}: (2+x)(3x-m^2+4)=0\\}$. Tích các giá trị của tham số m để $n(A\\cup B)=3$ bằng bao nhiêu?",
+        correctAnswer: "42",
+        explanation: "Tập $A$ có các nghiệm là $x=1, x=\\frac{2}{3}, x=-\\sqrt{2}$. Vì điều kiện $x \\in \\mathbb{Q}$ (số hữu tỉ), ta loại $-\\sqrt{2}$. Vậy $A = \\{1; \\frac{2}{3}\\}$. <br>Tập $B$ có các nghiệm $x=-2$ và $x=\\frac{m^2-4}{3}$. <br>Để $n(A \\cup B) = 3$, mà $A \\cup B$ đã chắc chắn chứa các phần tử $\\{1; \\frac{2}{3}; -2\\}$ (đây là 3 phần tử khác nhau), nên nghiệm còn lại của $B$ là $\\frac{m^2-4}{3}$ BẮT BUỘC phải trùng với 1 trong 3 phần tử này. <br>TH1: $\\frac{m^2-4}{3} = 1 \\Rightarrow m^2 = 7 \\Rightarrow m = \\pm \\sqrt{7}$. <br>TH2: $\\frac{m^2-4}{3} = \\frac{2}{3} \\Rightarrow m^2 = 6 \\Rightarrow m = \\pm \\sqrt{6}$. <br>TH3: $\\frac{m^2-4}{3} = -2 \\Rightarrow m^2 = -2$ (Vô nghiệm). <br>Vậy có 4 giá trị của $m$. Tích của chúng là: $\\sqrt{7} \\cdot (-\\sqrt{7}) \\cdot \\sqrt{6} \\cdot (-\\sqrt{6}) = -7 \\cdot (-6) = 42$.",
+        reviewHint: "Số phần tử của tập hợp $n(A \\cup B)$ phụ thuộc vào sự trùng lặp nghiệm. Hãy giải riêng rẽ từng tập hợp rồi ráp điều kiện."
+      },
+      {
+        id: 20, type: "short", level: "Thông hiểu", skill: "Toán thực tế (Biểu đồ Venn 2 tập)",
+        question: "Một lớp có 45 học sinh, đăng kí chơi ít nhất một trong hai môn thể thao là bóng đá và cầu lông. Có 30 em đăng kí môn bóng đá, 25 em đăng kí môn cầu lông. Hỏi có bao nhiêu em đăng kí cả hai môn thể thao?",
+        correctAnswer: "10",
+        explanation: "Áp dụng công thức biểu đồ Venn cho 2 tập hợp: $n(A \\cup B) = n(A) + n(B) - n(A \\cap B)$. <br>Theo đề, tất cả 45 em đều chơi ít nhất 1 môn, nên $n(A \\cup B) = 45$. <br>Thay số: $45 = 30 + 25 - n(A \\cap B) \\Rightarrow n(A \\cap B) = 55 - 45 = 10$. <br>Vậy có 10 em đăng kí chơi cả hai môn.",
+        reviewHint: "Tổng số người chơi môn A và môn B trừ đi tổng sĩ số thực tế sẽ ra số lượng bị đếm trùng (người chơi cả 2 môn)."
+      },
+      {
+        id: 21, type: "short", level: "Vận dụng", skill: "Toán thực tế (Biểu đồ Venn 3 tập)",
+        question: "Lớp 10A có 45 học sinh trong đó có 25 em học giỏi Toán, 23 em học giỏi Văn, 20 em học giỏi Tiếng Anh. Đồng thời có 11 em giỏi cả Toán và Văn, 8 em giỏi cả Văn và Tiếng Anh, 9 em giỏi cả Toán và Tiếng Anh, biết rằng mỗi học sinh trong lớp giỏi ít nhất một trong ba môn này. Hỏi lớp 10A có bao nhiêu bạn học giỏi cả ba môn Toán, Văn, Tiếng Anh?",
+        correctAnswer: "5",
+        explanation: "Áp dụng công thức biểu đồ Venn 3 vòng: <br>$n(T \\cup V \\cup A) = n(T) + n(V) + n(A) - n(T \\cap V) - n(V \\cap A) - n(T \\cap A) + n(T \\cap V \\cap A)$. <br>Thay các dữ kiện vào công thức: <br>$45 = 25 + 23 + 20 - 11 - 8 - 9 + x$. <br>$\\Leftrightarrow 45 = 68 - 28 + x$. <br>$\\Leftrightarrow 45 = 40 + x \\Rightarrow x = 5$. <br>Vậy có 5 học sinh học giỏi cả 3 môn.",
+        reviewHint: "Học thuộc công thức bao hàm - loại trừ 3 tập hợp. Số phần tử giao của cả 3 tập luôn mang dấu (+)."
+      },
+      {
+        id: 22, type: "short", level: "Vận dụng cao", skill: "Tập hợp chứa tham số khó",
+        question: "Cho hai tập hợp $A=\\{x\\in\\mathbb{R} | 1\\le |x| \\le 2\\}$; $B=(-\\infty;m-2]\\cup[m;+\\infty)$. Có bao nhiêu giá trị nguyên của $m\\in[-2023;2024]$ để $A\\subset B$?",
+        correctAnswer: "4044",
+        explanation: "Tập $A = [-2; -1] \\cup [1; 2]$. <br>Để $A \\subset B$, thì từng đoạn của A phải nằm gọn trong các khoảng của B. <br>Đoạn thứ nhất $[-2; -1] \\subset B \\Rightarrow [-2; -1]$ phải nằm gọn bên trái $(-\\infty; m-2]$ (tức $-1 \\le m-2 \\Rightarrow m \\ge 1$) HOẶC nằm gọn bên phải $[m; +\\infty)$ (tức $-2 \\ge m \\Rightarrow m \\le -2$). Vậy với đoạn 1: $m \\ge 1$ hoặc $m \\le -2$. <br>Đoạn thứ hai $[1; 2] \\subset B \\Rightarrow [1; 2]$ phải nằm bên trái (tức $2 \\le m-2 \\Rightarrow m \\ge 4$) HOẶC nằm bên phải (tức $1 \\ge m \\Rightarrow m \\le 1$). Vậy với đoạn 2: $m \\ge 4$ hoặc $m \\le 1$. <br>Giao hai điều kiện lại, ta có các dải nghiệm: $m \\in (-\\infty; -2] \\cup \\{1\\} \\cup [4; +\\infty)$. <br>Xét trong đoạn $[-2023; 2024]$: <br>- Nhánh 1: Từ $-2023$ đến $-2$ có: $(-2) - (-2023) + 1 = 2022$ số. <br>- Nhánh 2: Số $1$ (có 1 số). <br>- Nhánh 3: Từ $4$ đến $2024$ có: $2024 - 4 + 1 = 2021$ số. <br>Tổng số lượng: $2022 + 1 + 2021 = 4044$ giá trị.",
+        reviewHint: "Chia tập hợp mang dấu giá trị tuyệt đối thành các đoạn rời rạc. Xử lý điều kiện chứa con cho từng đoạn rồi mới lấy GIAO các điều kiện lại với nhau."
+      }
+    ];
+
+    /* STREAMING_CHUNK: Trình xử lý hiển thị và tính toán Bài kiểm tra (Phần 2) */
+    let quizUserInfo = { hoTen: "", lop: "", stt: "" };
+    let currentQuestionIndex = 0;
+    let userAnswers = {}; 
+    let timeRemaining = 90 * 60; 
+    let timerInterval = null;
+    let totalScore = 10;
+    let finalQuizScore = 0;
+
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const quizInterface = document.getElementById('quiz-interface');
+    const resultsScreen = document.getElementById('results-screen');
+    const startBtn = document.getElementById('start-btn');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const submitBtn = document.getElementById('submit-btn');
+    const timerDisplay = document.getElementById('timer');
+    const questionGrid = document.getElementById('question-grid');
+    const answersContainer = document.getElementById('answers-container');
+    const progressTextQuiz = document.getElementById('progress-text-quiz');
+    const progressPercentQuiz = document.getElementById('progress-percent-quiz');
+    const progressBarQuiz = document.getElementById('progress-bar-quiz');
+    const timeLimitSlider = document.getElementById('time-limit');
+    const sliderValDisp = document.getElementById('slider-val');
+    const sectionHeader = document.getElementById('section-header');
+
+    timeLimitSlider.addEventListener('input', (e) => {
+      sliderValDisp.innerText = e.target.value + " phút";
+      timeRemaining = parseInt(e.target.value) * 60;
+    });
+
+    startBtn.addEventListener('click', () => {
+      const nameInput = document.getElementById('student-name').value.trim();
+      const classInput = document.getElementById('student-class').value.trim();
+      const sttInput = document.getElementById('student-stt').value.trim();
+
+      if (!nameInput || !classInput) {
+        alert("Vui lòng điền đầy đủ Họ tên và Lớp học để bắt đầu thi!");
+        return;
+      }
+
+      quizUserInfo.hoTen = nameInput;
+      quizUserInfo.lop = classInput;
+      quizUserInfo.stt = sttInput;
+
+      document.getElementById('disp-name').innerText = quizUserInfo.hoTen;
+      document.getElementById('disp-class').innerText = quizUserInfo.lop;
+      document.getElementById('disp-stt').innerText = quizUserInfo.stt || "Không có";
+      document.getElementById('profile-display').style.display = 'flex';
+
+      welcomeScreen.style.display = 'none';
+      quizInterface.style.display = 'block';
+
+      buildQuestionGrid();
+      renderQuestion(0);
+      startTimer();
+    });
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        if (timeRemaining <= 0) {
+          clearInterval(timerInterval);
+          timerDisplay.innerText = "Hết giờ!";
+          alert("Đã hết thời gian làm bài! Hệ thống đang tự động nộp bài thi.");
+          autoSubmit();
+        } else {
+          const mins = Math.floor(timeRemaining / 60);
+          const secs = timeRemaining % 60;
+          timerDisplay.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+      }, 1000);
+    }
+
+    function buildQuestionGrid() {
+      questionGrid.innerHTML = "";
+      questions.forEach((q, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'grid-btn';
+        btn.id = `grid-btn-${index}`;
+        btn.innerText = q.id;
+        btn.addEventListener('click', () => {
+          saveCurrentAnswerState();
+          renderQuestion(index);
+        });
+        questionGrid.appendChild(btn);
+      });
+    }
+
+    function renderQuestion(index) {
+      currentQuestionIndex = index;
+      const q = questions[index];
+
+      document.querySelectorAll('.grid-btn').forEach(btn => btn.classList.remove('current'));
+      const currentBtn = document.getElementById(`grid-btn-${index}`);
+      if (currentBtn) currentBtn.classList.add('current');
+
+      if (q.type === "single") {
+          sectionHeader.innerText = "PHẦN I. CÂU TRẮC NGHIỆM NHIỀU PHƯƠNG ÁN LỰA CHỌN";
+          sectionHeader.style.display = "inline-block";
+      } else if (q.type === "tf") {
+          sectionHeader.innerText = "PHẦN II. CÂU TRẮC NGHIỆM ĐÚNG SAI";
+          sectionHeader.style.display = "inline-block";
+      } else if (q.type === "short") {
+          sectionHeader.innerText = "PHẦN III. CÂU TRẮC NGHIỆM TRẢ LỜI NGẮN";
+          sectionHeader.style.display = "inline-block";
+      } else {
+          sectionHeader.style.display = "none";
+      }
+
+      document.getElementById('question-header').innerHTML = `Câu ${q.id} [${q.level}] - Kỹ năng: ${q.skill}`;
+      document.getElementById('question-text').innerHTML = q.question;
+
+      const imageDiv = document.getElementById('question-image');
+      if (q.svgKey && svgDatabase[q.svgKey]) {
+        imageDiv.innerHTML = svgDatabase[q.svgKey];
+        imageDiv.style.display = 'block';
+      } else {
+        imageDiv.innerHTML = "";
+        imageDiv.style.display = 'none';
+      }
+
+      answersContainer.innerHTML = "";
+
+      if (q.type === "single") {
+        const ul = document.createElement('ul');
+        ul.className = 'options-list';
+        
+        q.options.forEach((opt, optIdx) => {
+          const li = document.createElement('li');
+          li.className = 'option-item';
+          if (userAnswers[q.id] === optIdx) { li.classList.add('selected'); }
+          
+          li.innerHTML = `
+            <input type="radio" name="q-${q.id}" id="opt-${optIdx}" ${userAnswers[q.id] === optIdx ? 'checked' : ''}>
+            <label for="opt-${optIdx}" style="cursor: pointer; width: 100%; display: block;">${opt}</label>
+          `;
+          
+          li.addEventListener('click', () => {
+            userAnswers[q.id] = optIdx;
+            document.querySelectorAll('.option-item').forEach(item => item.classList.remove('selected'));
+            li.classList.add('selected');
+            li.querySelector('input').checked = true;
+            updateQuizProgress();
+          });
+          
+          ul.appendChild(li);
+        });
+        answersContainer.appendChild(ul);
+
+      } else if (q.type === "tf") {
+        const table = document.createElement('table');
+        table.className = 'tf-table';
+        
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Phát biểu / Khẳng định</th>
+              <th>Lựa chọn trả lời</th>
+            </tr>
+          </thead>
+          <tbody id="tf-rows"></tbody>
+        `;
+        
+        const tbody = table.querySelector('#tf-rows');
+        
+        q.subQuestions.forEach((subQ, subIdx) => {
+          const tr = document.createElement('tr');
+          const ansVal = userAnswers[q.id] ? userAnswers[q.id][subIdx] : null;
+
+          tr.innerHTML = `
+            <td class="statement">${subQ.text}</td>
+            <td>
+              <span class="tf-btn true-btn ${ansVal === 'D' ? 'active' : ''}" data-sub="${subIdx}" data-val="D">Đúng</span>
+              <span class="tf-btn false-btn ${ansVal === 'S' ? 'active' : ''}" data-sub="${subIdx}" data-val="S">Sai</span>
+            </td>
+          `;
+
+          tr.querySelectorAll('.tf-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              if (!userAnswers[q.id]) { userAnswers[q.id] = {}; }
+              const sIdx = parseInt(btn.getAttribute('data-sub'));
+              const val = btn.getAttribute('data-val');
+
+              tr.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+              btn.classList.add('active');
+              userAnswers[q.id][sIdx] = val;
+
+              updateQuizProgress();
+            });
+          });
+
+          tbody.appendChild(tr);
+        });
+        answersContainer.appendChild(table);
+
+      } else if (q.type === "short") {
+        const value = userAnswers[q.id] || "";
+        const div = document.createElement('div');
+        div.className = 'short-answer-container';
+        div.innerHTML = `
+          <p style="font-size: 15px; margin-bottom: 8px; font-weight: bold; color: var(--primary-color);">Nhập đáp án số:</p>
+          <input type="text" class="short-answer-input" id="short-input-${q.id}" value="${value}" placeholder="Kết quả của bạn...">
+        `;
+        
+        const input = div.querySelector('input');
+        input.addEventListener('input', (e) => {
+          userAnswers[q.id] = e.target.value.trim();
+          updateQuizProgress();
+        });
+
+        answersContainer.appendChild(div);
+      }
+
+      prevBtn.disabled = index === 0;
+      prevBtn.style.opacity = index === 0 ? "0.5" : "1";
+      
+      if (index === questions.length - 1) {
+        nextBtn.innerText = "Kiểm tra phiếu & Nộp bài";
+        nextBtn.style.backgroundColor = '#F5B400';
+      } else {
+        nextBtn.innerText = "Câu tiếp theo →";
+        nextBtn.style.backgroundColor = "";
+      }
+
+      if (window.MathJax) { MathJax.typesetPromise(); }
+    }
+
+    /* STREAMING_CHUNK: Trình xử lý lưu trạng thái và nộp bài (Calculate Score) */
+    function saveCurrentAnswerState() {
+      const q = questions[currentQuestionIndex];
+      if (q.type === "short") {
+        const input = document.getElementById(`short-input-${q.id}`);
+        if (input) { userAnswers[q.id] = input.value.trim(); }
+      }
+    }
+
+    function updateQuizProgress() {
+      let completedCount = 0;
+      
+      questions.forEach((q, index) => {
+        const btn = document.getElementById(`grid-btn-${index}`);
+        let answered = false;
+
+        if (q.type === "single" && userAnswers[q.id] !== undefined) {
+          answered = true;
+        } else if (q.type === "tf" && userAnswers[q.id] && Object.keys(userAnswers[q.id]).length === 4) {
+          answered = true;
+        } else if (q.type === "short" && userAnswers[q.id] !== undefined && userAnswers[q.id] !== "") {
+          answered = true;
+        }
+
+        if (answered) {
+          completedCount++;
+          if (btn) btn.classList.add('answered');
+        } else {
+          if (btn) btn.classList.remove('answered');
+        }
+      });
+
+      const percent = Math.round((completedCount / questions.length) * 100);
+      progressTextQuiz.innerText = `${completedCount}/${questions.length}`;
+      progressPercentQuiz.innerText = `${percent}%`;
+      progressBarQuiz.style.width = `${percent}%`;
+    }
+
+    nextBtn.addEventListener('click', () => {
+      saveCurrentAnswerState();
+      if (currentQuestionIndex < questions.length - 1) { renderQuestion(currentQuestionIndex + 1); } 
+      else { triggerSubmitConfirm(); }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      saveCurrentAnswerState();
+      if (currentQuestionIndex > 0) { renderQuestion(currentQuestionIndex - 1); }
+    });
+
+    submitBtn.addEventListener('click', () => {
+      saveCurrentAnswerState();
+      triggerSubmitConfirm();
+    });
+
+    function triggerSubmitConfirm() {
+      let missed = [];
+      questions.forEach(q => {
+        if (q.type === "single" && userAnswers[q.id] === undefined) { missed.push(q.id); } 
+        else if (q.type === "tf" && (!userAnswers[q.id] || Object.keys(userAnswers[q.id]).length < 4)) { missed.push(q.id); } 
+        else if (q.type === "short" && (!userAnswers[q.id] || userAnswers[q.id] === "")) { missed.push(q.id); }
+      });
+
+      let msg = "Bạn có chắc chắn muốn nộp bài thi để tiến hành chấm điểm?";
+      if (missed.length > 0) {
+        msg = `Bạn chưa hoàn thành đầy đủ các câu hỏi: ${missed.join(', ')}.\n\nBạn vẫn muốn nộp bài chứ?`;
+      }
+
+      if (confirm(msg)) { autoSubmit(); }
+    }
+
+    function autoSubmit() {
+      clearInterval(timerInterval);
+      calculateScore();
+      submitResult();
+      displayResults();
+    }
+
+    function calculateScore() {
+      finalQuizScore = 0;
+      
+      questions.forEach(q => {
+        q.isCorrect = false; 
+        
+        if (q.type === "single") {
+          if (userAnswers[q.id] === q.correctAnswer) {
+            finalQuizScore += 0.25;
+            q.isCorrect = true;
+          }
+        } else if (q.type === "tf") {
+          let correctSubsCount = 0;
+          const answers = userAnswers[q.id] || {};
+          
+          q.subQuestions.forEach((subQ, idx) => {
+            if (answers[idx] === subQ.correctAnswer) { correctSubsCount++; }
+          });
+
+          q.correctSubsCount = correctSubsCount; 
+          
+          if (correctSubsCount === 1) { finalQuizScore += 0.1; } 
+          else if (correctSubsCount === 2) { finalQuizScore += 0.25; } 
+          else if (correctSubsCount === 3) { finalQuizScore += 0.5; } 
+          else if (correctSubsCount === 4) { finalQuizScore += 1.0; q.isCorrect = true; }
+        } else if (q.type === "short") {
+          const uAns = (userAnswers[q.id] || "").toString().trim().replace(/,/g, '.').replace(/\s+/g, '');
+          const cAns = q.correctAnswer.toString().trim().replace(/\s+/g, '');
+          
+          if (uAns === cAns && uAns !== "") {
+            finalQuizScore += 0.5;
+            q.isCorrect = true;
+          }
+        }
+      });
+
+      finalQuizScore = Math.round(finalQuizScore * 100) / 100;
+    }
+
+    function submitResult() {
+      const timestamp = new Date().toLocaleString("vi-VN");
+      const payload = {
+        timestamp: timestamp,
+        hoTen: quizUserInfo.hoTen || "Không có",
+        lop: quizUserInfo.lop || "Không có",
+        stt: quizUserInfo.stt || "",
+        diem: finalQuizScore,
+        tongDiem: totalScore,
+        tenGame: " GAME MATH"
+      };
+
+      const url = "https://script.google.com/macros/s/AKfycbxKGYC7AKG9TBL7EOqO_VB5hXV2-JYvzA2u2VG-g2z7Zg57KodaOMeseM1LS6vh4K08Ng/exec";
+
+      fetch(url, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).then(() => {
+        console.log("Kết quả nộp bài đã được gửi thành công đến Google Sheet!");
+      }).catch((err) => {
+        console.error("Gặp sự cố khi kết nối dữ liệu Google Sheet:", err);
+      });
+    }
+
+    /* STREAMING_CHUNK: Trình xử lý hiển thị màn hình phân tích kết quả */
+    function displayResults() {
+      quizInterface.style.display = 'none';
+      document.getElementById('profile-display').style.display = 'none';
+      resultsScreen.style.display = 'block';
+
+      document.getElementById('score').innerText = finalQuizScore.toFixed(2);
+      document.getElementById('res-name').innerText = quizUserInfo.hoTen;
+      document.getElementById('res-class').innerText = quizUserInfo.lop;
+
+      let completedCount = 0;
+      let completelyCorrectCount = 0;
+      questions.forEach(q => {
+        if (userAnswers[q.id] !== undefined) completedCount++;
+        if (q.isCorrect) completelyCorrectCount++;
+      });
+
+      document.getElementById('res-answered').innerText = `${completedCount} / 22 câu`;
+      
+      const accuracy = Math.round((completelyCorrectCount / questions.length) * 100);
+      document.getElementById('res-accuracy').innerText = `${accuracy}%`;
+
+      let rating = "";
+      if (finalQuizScore >= 9) { rating = "Xuất sắc (Chúc mừng bạn!)"; } 
+      else if (finalQuizScore >= 7) { rating = "Tốt (Làm bài rất ổn)"; } 
+      else if (finalQuizScore >= 5) { rating = "Đạt (Cần luyện thêm đề)"; } 
+      else { rating = "Cần ôn tập thêm (Hổng kiến thức nặng)"; }
+      document.getElementById('rating').innerText = `Xếp loại: ${rating}`;
+
+      const skillsAnalysis = {};
+      questions.forEach(q => {
+        if (!skillsAnalysis[q.skill]) { skillsAnalysis[q.skill] = { total: 0, correct: 0 }; }
+        skillsAnalysis[q.skill].total++;
+        if (q.isCorrect) { skillsAnalysis[q.skill].correct++; }
+      });
+
+      const listContainer = document.getElementById('analysis-list');
+      listContainer.innerHTML = "";
+      
+      let weakestSkill = "";
+      let minAcc = 1.0;
+      const weakSkillsList = [];
+
+      for (const [skillName, stats] of Object.entries(skillsAnalysis)) {
+        const acc = stats.correct / stats.total;
+        const isWeak = acc < 0.6;
+        if (isWeak) weakSkillsList.push(skillName);
+
+        if (acc < minAcc) {
+          minAcc = acc;
+          weakestSkill = skillName;
+        }
+
+        const item = document.createElement('div');
+        item.className = `analysis-item ${isWeak ? 'weak' : 'strong'}`;
+        item.innerHTML = `
+          <span>${skillName}</span>
+          <span>Đúng ${stats.correct}/${stats.total} câu (${Math.round(acc*100)}%) ${isWeak ? '(&darr; Cần ôn lại)' : '(&check; Đạt)'}</span>
+        `;
+        listContainer.appendChild(item);
+      }
+
+      const tipsContent = document.getElementById('tips-content');
+      if (weakSkillsList.length > 0) {
+        tipsContent.innerHTML = `
+          <p>Qua thống kê bài thi, bạn đang bị yếu ở các phần chuyên đề:</p>
+          <ul style="margin: 8px 0 12px 20px; font-weight: bold; color: var(--danger-color);">
+            ${weakSkillsList.map(s => `<li>- ${s}</li>`).join('')}
+          </ul>
+          <p><b>Đề xuất ôn tập:</b> Xem lại các gợi ý học tập trong phần đáp án chi tiết phía dưới, tập trung ôn luyện các dạng bài tập tự luận và ví dụ mẫu liên quan đến <i>${weakestSkill}</i> trong sách giáo khoa toán để cải thiện tốc độ và kỹ năng.</p>
+        `;
+      } else {
+        tipsContent.innerHTML = `
+          <p style="color: var(--success-color); font-weight: bold;">&check; Thật xuất sắc! Bạn đã làm chủ hoàn toàn các chuyên đề trong bài kiểm tra.</p>
+          <p style="margin-top: 5px;"><b>Đề xuất ôn tập:</b> Hãy tiếp tục giữ vững phong độ và thử thách với các đề thi nâng cao hơn (Đề thi thử THPT Quốc Gia mức độ Vận dụng cao) để chuẩn bị tốt nhất cho kì thi chính thức.</p>
+        `;
+      }
+
+      buildDetailedReview();
+
+      if (window.MathJax) { MathJax.typesetPromise(); }
+    }
+
+    function buildDetailedReview() {
+      const container = document.getElementById('review-cards-container');
+      container.innerHTML = "";
+
+      questions.forEach((q, idx) => {
+        const card = document.createElement('div');
+        const isCorrect = q.isCorrect;
+        card.className = `review-question-card ${isCorrect ? 'correct-card' : 'incorrect-card'}`;
+
+        let userAnsLabel = "";
+        if (q.type === "single") {
+          userAnsLabel = userAnswers[q.id] !== undefined ? q.options[userAnswers[q.id]] : "Chưa chọn";
+        } else if (q.type === "tf") {
+          const uTF = userAnswers[q.id] || {};
+          const parts = [];
+          q.subQuestions.forEach((sub, sIdx) => {
+            parts.push(`[Ý ${String.fromCharCode(97+sIdx)}: ${uTF[sIdx] || 'Chưa chọn'}]`);
+          });
+          userAnsLabel = parts.join(' ');
+        } else if (q.type === "short") {
+          userAnsLabel = userAnswers[q.id] !== undefined && userAnswers[q.id] !== "" ? userAnswers[q.id] : "Chưa trả lời";
+        }
+
+        let correctAnsLabel = "";
+        if (q.type === "single") {
+          correctAnsLabel = q.options[q.correctAnswer];
+        } else if (q.type === "tf") {
+          const parts = [];
+          q.subQuestions.forEach((sub, sIdx) => {
+            parts.push(`[Ý ${String.fromCharCode(97+sIdx)}: ${sub.correctAnswer}]`);
+          });
+          correctAnsLabel = parts.join(' ');
+        } else if (q.type === "short") {
+          correctAnsLabel = q.correctAnswer;
+        }
+
+        card.innerHTML = `
+          <span class="status-badge ${isCorrect ? 'correct' : 'incorrect'}">
+            ${isCorrect ? 'ĐÚNG' : (q.type === 'tf' ? `ĐÚNG ${q.correctSubsCount}/4 Ý` : 'SAI / THIẾU')}
+          </span>
+          <div style="font-weight: bold; color: var(--primary-color); margin-bottom: 8px;">
+            Câu ${q.id} [${q.level}] - Kỹ năng: ${q.skill}
+          </div>
+          <div style="font-size: 16px; margin-bottom: 15px;">
+            ${q.question}
+          </div>
+          
+          ${q.svgKey ? `<div style="text-align: center; margin: 10px 0;">${svgDatabase[q.svgKey]}</div>` : ''}
+
+          <div style="font-size: 14px; margin-bottom: 5px;">
+            <b>Đã chọn:</b> <span style="color: ${isCorrect ? 'var(--success-color)' : 'var(--danger-color)'}; font-weight: bold;">${userAnsLabel}</span>
+          </div>
+          <div style="font-size: 14px; margin-bottom: 12px;">
+            <b>Đáp án đúng chuẩn:</b> <span style="color: var(--success-color); font-weight: bold;">${correctAnsLabel}</span>
+          </div>
+
+          <div class="explanation-box">
+            <b>Giải thích sư phạm:</b><br>
+            ${q.explanation}
+          </div>
+
+          <div class="review-hint-box">
+            <b>Gợi ý tự ôn tập:</b><br>
+            ${q.reviewHint}
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+  </script>
+</body>
+</html>
